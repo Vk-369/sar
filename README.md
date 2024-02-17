@@ -25,3 +25,13 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+<!-- !these are mine -->
+*ng serve --host 192.168.1.26 --port 4200
+*http://192.168.1.26:4200
+*7067C3 this is the color code that should be used through out 
+ font-family: 'Times New Roman', Times, serif;  standard font style
+
+
+
+

@@ -1,0 +1,63 @@
+<div class="back-icon">
+    <img src="assets/images/login/back.png" alt="login image backgroung">
+</div>
+<div class="main">
+    <div class="step-class">
+        STEP :3/7
+    </div>
+    <div class="set-password-text">
+        Set Your Password
+    </div>
+    <div class="input-card">
+        <input *ngIf="setPassword" type="password" class="form-control" placeholder="Enter password">
+        <input *ngIf="!setPassword" type="password" class="form-control" placeholder="Re-Enter password">
+    </div>
+    <div class="side-by-side" *ngIf="setPassword">
+        <div class="password-strength password-cond-satisfied"></div>
+        <div class="password-strength"></div>
+        <div class="password-strength"></div>
+        <div class="password-strength"></div>
+    </div>
+    <ng-container *ngIf="setPassword">
+        <div class="side-by-side">
+            <div class="password-rules">
+                <span class="dot">.</span>
+                8+ Char's
+            </div>
+            <div class="password-rules">
+                <span class="dot">.</span>
+                1+ Capital's
+                <div>
+                </div>
+            </div>
+        </div>
+        <div class="side-by-side">
+            <div class="password-rules">
+                <span class="dot">.</span>
+                <!-- 1 Number -->
+                1+ Symbol
+            </div>
+            <div class="password-rules">
+                <span class="dot">.</span>
+                1+ Numbers
+
+            </div>
+        </div>
+    </ng-container>
+    <!-- <div *ngIf="!setPassword" class="password-matched">
+                <img src="assets/images/login/green-tick.svg" alt="success-tick">
+            <div>
+                PasswordMatched
+            </div>
+    </div> -->
+
+
+
+    <div class="sign-up-logo">
+        <!-- <img src="assets/images/login/Secure login-rafiki.svg" alt="Sign up Image Background"> -->
+        <img src="assets/images/login/password-blue.svg" alt="Sign up Image Background">
+    </div>
+
+    <button class="btn-continue" *ngIf="setPassword">Continue</button>
+    <button class="btn-continue" *ngIf="!setPassword">Proceed</button>
+</div>

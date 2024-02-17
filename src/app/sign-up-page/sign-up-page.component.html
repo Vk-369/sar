@@ -1,0 +1,33 @@
+<div class="back-icon">
+<img src="assets/images/login/back.png" alt="login image backgroung">
+</div>
+<div class="main-wrap">
+    
+    <div class="step-class">
+        STEP 1/7
+    </div>
+    <div class="text-class">
+        Which one are you?
+    </div>
+</div>
+
+<div class="image-set">
+    <div class="image-card" [ngClass]="{'active': itemSelected == 'men'}" (click)="selectedCard('men')">
+        <img src="assets/images/login/Drawing_1.svg" alt="login image backgroung">
+       <div class="text-alignment-class"> <span >Men</span></div>
+    </div>
+    <div class="image-card" [ngClass]="{'active': itemSelected == 'women'}" (click)="selectedCard('women')">
+        <img src="assets/images/login/Selfie_1.svg" alt="login image backgroung">
+        <div class="text-alignment-class"> <span >Women</span></div>
+    </div>
+</div>
+
+<div class="text-alignment-class change-color">
+    To give you a customize experience <br>
+        we need to know your gender
+</div >
+<div class="text-alignment-class">
+    <button class="button-class">
+       Continue
+    </button>
+</div>
