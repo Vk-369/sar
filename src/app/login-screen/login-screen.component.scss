@@ -1,7 +1,7 @@
 .main{
     text-align: center;
     .step-class{
-        margin-top: 5px;
+        margin-top: 30px;
         color: #7067C2;
         font-size: 12px;
         font-family: monospace;
@@ -14,19 +14,11 @@
     // font-family: math;
     font-family: 'Open Sans', sans-serif
 
-}
-.input-card
+}.input-card
 {
-    background-color: white;
-    padding-top: 1px;
-    width:300px;
-    height: 240px;
     border-radius: 8px;
-    margin:auto;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 111;
-    // padding-top: 1px;
-    
+    border: none;
+    color: black;
 }
 .password-strength
 {
@@ -47,7 +39,7 @@
 }
 
 }
-.form-controlOne {
+.form-controlOne{
         // box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.15),
         // -5px -5px 5px rgba(0, 0, 0, 0.1);
         border: none;
@@ -72,7 +64,7 @@
     .password-rules
     {
         font-size: small;
-            margin-top: 15px;
+            margin-top: 20px;
             margin-left:20px;
             margin-right:20px;
     }
@@ -117,9 +109,43 @@ margin:auto;
             height: 100%;
         }
     }
-
-
+.resetBtn
+{
+    color: #7067C2;
+}
+.forgot-password{
+    margin-top: 5px;
+    font-size: small;
+}
+.main-card
+{
+    // background-color:red;
+    width:300px;
+    height:px;
+    margin: auto;
+    background-color: white;
+    border-radius: 8px;
+    padding-top: 5px;
+    padding-bottom:30px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1)
+}
   
+
+.digit-box {
+    // margin-top: 10px;
+    width: 30px;
+    height: 30px;
+    margin: 10px 5px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: none;
+    background-color: #E9E5F3;
+    outline: none;
+    
+    display: inline-block;
+  }
 // .password-matched
 // {
 //     color:rgb(26, 163, 26);

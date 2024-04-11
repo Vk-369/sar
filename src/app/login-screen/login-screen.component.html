@@ -1,0 +1,45 @@
+<div class="back-icon">
+    <img src="assets/images/login/back.png" alt="login image backgroung">
+</div>
+<div class="main">
+    <div class="main-card">
+        <div class="step-class">
+            STEP :3/7
+        </div>
+        <div class="set-password-text">
+            Login Credentials
+        </div>
+        <div class="input-card" *ngIf="!isResetClicked">
+            <input type="text" class="form-controlOne" placeholder="Enter User Name">
+            <input type="password" class="form-controlOne" placeholder="Enter password">
+        </div>
+        <div class="input-card">
+            <input *ngIf="isResetClicked && !isGmailIdEntered" type="text" class="form-controlOne"
+                placeholder="Registered Gmail">
+            <div *ngIf="isResetClicked && isGmailIdEntered">
+                <input type="text" type='number' class="digit-box">
+                <input type="text" type='number' class="digit-box">
+                <input type="text" type='number' class="digit-box">
+                <input type="text" type='number' class="digit-box">
+                <input type="text" type='number' class="digit-box">
+            </div>
+        </div>
+        <div class="forgot-password" *ngIf="!isResetClicked">
+            forgot password ?<span class="resetBtn" (click)="resetPassword()"> reset</span>
+        </div>
+        <div class="forgot-password" *ngIf="isResetClicked && isGmailIdEntered">
+            Didn't received code ?<span class="resetBtn"> resend</span>
+        </div>
+    </div>
+
+    <div class="sign-up-logo">
+        <img src="assets/images/login/login details.svg" alt="Sign up Image Background">
+    </div>
+
+    <button class="btn-continue" *ngIf="isResetClicked && !isGmailIdEntered" (click)="gmailEnter()">Continue</button>
+    <button class="btn-continue"  *ngIf="!isResetClicked" (click)="authenticate();navigation()">ContinueAuth</button>
+    <button class="btn-continue" *ngIf="isGmailIdEntered" (click)="verifyOtp()">Verify</button>
+</div>
+<ng-container  *ngIf="openModal">
+<app-modal [modalBody]="text" [openModalCondition]=true (closeModal)="fromModal($event)"></app-modal>
+</ng-container>

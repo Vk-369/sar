@@ -1,63 +1,67 @@
-<div class="back-icon">
+<div class="back-icon" (click)="back()">
     <img src="assets/images/login/back.png" alt="login image backgroung">
 </div>
 <div class="main">
+    <div class="input-card">
     <div class="step-class">
-        STEP :3/7
+        STEP :2/7
     </div>
     <div class="set-password-text">
-        Set Your Password
+        Personal Details
     </div>
-    <div class="input-card">
-        <input *ngIf="setPassword" type="password" class="form-control" placeholder="Enter password">
-        <input *ngIf="!setPassword" type="password" class="form-control" placeholder="Re-Enter password">
-    </div>
-    <div class="side-by-side" *ngIf="setPassword">
-        <div class="password-strength password-cond-satisfied"></div>
-        <div class="password-strength"></div>
-        <div class="password-strength"></div>
-        <div class="password-strength"></div>
-    </div>
-    <ng-container *ngIf="setPassword">
-        <div class="side-by-side">
-            <div class="password-rules">
-                <span class="dot">.</span>
-                8+ Char's
-            </div>
-            <div class="password-rules">
-                <span class="dot">.</span>
-                1+ Capital's
-                <div>
+        <input *ngIf="enterDetails" type="text" class="form-controlOne" placeholder="Full Name">
+        <input *ngIf="enterDetails" type="text" class="form-controlOne" placeholder="Gmail">
+        <input *ngIf="enterDetails" type="text" class="form-controlOne" placeholder="Mobile Number">
+        <input *ngIf="!enterDetails && !pswrdEntered" type="password" class="form-controlOne" placeholder="Enter password">
+        <input *ngIf="!enterDetails && pswrdEntered" type="password" class="form-controlOne" placeholder="Re-Enter password">
+        <div class="side-by-side" *ngIf="!enterDetails && !pswrdEntered">
+            <div class="password-strength password-cond-satisfied"></div>
+            <div class="password-strength"></div>
+            <div class="password-strength"></div>
+            <div class="password-strength"></div>
+        </div>
+        <ng-container *ngIf="!enterDetails && !pswrdEntered">
+            <div class="side-by-side">
+                <div class="password-rules">
+                    <span class="dot">.</span>
+                    8+ Char's
+                </div>
+                <div class="password-rules">
+                    <span class="dot">.</span>
+                    1+ Capital's
+                    <div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="side-by-side">
-            <div class="password-rules">
-                <span class="dot">.</span>
-                <!-- 1 Number -->
-                1+ Symbol
+            <div class="side-by-side">
+                <div class="password-rules">
+                    <span class="dot">.</span>
+                    1+ Symbol
+                </div>
+                <div class="password-rules">
+                    <span class="dot">.</span>
+                    1+ Numbers
+    
+                </div>
             </div>
-            <div class="password-rules">
-                <span class="dot">.</span>
-                1+ Numbers
-
-            </div>
-        </div>
-    </ng-container>
-    <!-- <div *ngIf="!setPassword" class="password-matched">
-                <img src="assets/images/login/green-tick.svg" alt="success-tick">
-            <div>
-                PasswordMatched
-            </div>
-    </div> -->
-
-
-
+        </ng-container>
+    </div>
+   
+ 
+<!-- <div>make sure that password u have entered earlier should match with the above one</div> -->
     <div class="sign-up-logo">
         <!-- <img src="assets/images/login/Secure login-rafiki.svg" alt="Sign up Image Background"> -->
-        <img src="assets/images/login/password-blue.svg" alt="Sign up Image Background">
+        <img *ngIf="enterDetails"  src="assets/images/login/Social biography-amico (1).svg"  alt="Sign up Image Background">
+        <img *ngIf="!enterDetails"  src="assets/images/login/password.svg"  alt="Sign up Image Background">
     </div>
 
-    <button class="btn-continue" *ngIf="setPassword">Continue</button>
-    <button class="btn-continue" *ngIf="!setPassword">Proceed</button>
+    <button class="btn-continue" *ngIf="enterDetails " (click)="detailsEntered()">Continue1</button>
+    <button class="btn-continue" *ngIf="!enterDetails && !pswrdEntered" (click)="passWrdEntered();">continue2</button>
+    <button class="btn-continue" *ngIf="pswrdEntered" (click)="reEnterPswrd();">continue3</button>
 </div>
+
+<!-- this is the modal need to be developed -->
+<ng-container *ngIf="generatePswrd">
+  <app-modal modalBody="Account created Successfully" [openModalCondition]=true (closeModal)="modalEvent($event)"></app-modal>
+  
+</ng-container>
