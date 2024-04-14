@@ -23,6 +23,7 @@ export class SarServiceService {
   decodeParams(encryptedData: string): any {
     const decryptedData = CryptoJS.AES.decrypt(encryptedData, this.secretKey);
     const decryptedObject = JSON.parse(decryptedData.toString(CryptoJS.enc.Utf8));
+    console.log(decryptedObject)
     return decryptedObject;
   }
 

@@ -1,0 +1,116 @@
+<div class="back-icon" (click)="back()">
+    <img src="assets/images/login/back.png" alt="login image backgroung">
+</div>
+<form [formGroup]="signupForm">
+    <div class="main">
+        <div class="input-card">
+            <div class="step-class">
+                STEP :2/7
+            </div>
+            <div class="set-password-text">
+                Personal Details
+            </div>
+            <div *ngIf="step1">
+                <div>
+                    <input type="text" class="form-controlOne" placeholder="Full Name" formControlName="username"
+                        (blur)="onBlur('username')">
+                    <p class="is-error"
+                        *ngIf="blurControls['username'] && commonService.isValidControl(signupForm, 'username')">
+                        {{commonService.getErrorMsg(signupForm, 'username', 'Name')}}
+                    </p>
+                </div>
+                <div>
+                    <input type="text" class="form-controlOne" placeholder="Gmail" formControlName="mail_id"
+                        (blur)="onBlur('mail_id')">
+                    <p class="is-error"
+                        *ngIf="blurControls['mail_id'] && commonService.isValidControl(signupForm, 'mail_id')">
+                        {{commonService.getErrorMsg(signupForm, 'mail_id', 'Gmail')}}
+                    </p>
+                </div>
+                <div>
+                    <input type="text" class="form-controlOne" placeholder="Mobile Number" formControlName="phone_no"
+                        (blur)="onBlur('phone_no')">
+                    <p class="is-error"
+                        *ngIf="blurControls['phone_no'] && commonService.isValidControl(signupForm, 'phone_no')">
+                        {{commonService.getErrorMsg(signupForm, 'phone_no', 'Mobile Number')}}
+                    </p>
+                </div>
+            </div>
+            <div *ngIf="step2">
+                <input type="password" class="form-controlOne" placeholder="Enter password" formControlName="password"
+                    (blur)="onBlur('password')" (input)="passwordComplexity($event)">
+                <p class="is-error"
+                    *ngIf="blurControls['password'] && commonService.isValidControl(signupForm, 'password')">
+                    {{commonService.getErrorMsg(signupForm, 'password', 'Password')}}
+                </p>
+            </div>
+            <div *ngIf="step3">
+                <input type="password" class="form-controlOne" placeholder="Re-Enter password"
+                    formControlName="repassword" (blur)="onBlur('repassword')">
+                <p class="is-error"
+                    *ngIf="blurControls['repassword'] && commonService.isValidControl(signupForm, 'repassword')">
+                    {{commonService.getErrorMsg(signupForm, 'repassword', 'Password')}}
+                </p>
+            </div>
+            <div>
+
+                <div class="side-by-side" *ngIf="step2">
+                    <ng-container>
+                        <div class="password-strength" [ngClass]="{'password-cond-satisfied': passwordStrength.charLength}"></div>
+                        <div class="password-strength" [ngClass]="{'password-cond-satisfied': passwordStrength.capitalChar}"></div>
+                        <div class="password-strength" [ngClass]="{'password-cond-satisfied': passwordStrength.specialChar}"></div>
+                        <div class="password-strength" [ngClass]="{'password-cond-satisfied': passwordStrength.digit}"></div>
+                    </ng-container>
+                </div>
+                <ng-container *ngIf="step2">
+                    <div class="side-by-side">
+                        <div class="password-rules">
+                            <span class="dot">.</span>
+                            8+ Char's
+                        </div>
+                        <div class="password-rules">
+                            <span class="dot">.</span>
+                            1+ Capital's
+                            <div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side-by-side">
+                        <div class="password-rules">
+                            <span class="dot">.</span>
+                            1+ Symbol
+                        </div>
+                        <div class="password-rules">
+                            <span class="dot">.</span>
+                            1+ Numbers
+
+                        </div>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+
+
+        <!-- <div>make sure that password u have entered earlier should match with the above one</div> -->
+        <div class="sign-up-logo">
+            <!-- <img src="assets/images/login/Secure login-rafiki.svg" alt="Sign up Image Background"> -->
+            <img *ngIf="step1" src="assets/images/login/Social biography-amico (1).svg" alt="Sign up Image Background">
+            <img *ngIf="!step1" src="assets/images/login/password.svg" alt="Sign up Image Background">
+        </div>
+
+        <button class="btn-continue" *ngIf="step1 " (click)="gotoStep2()">Continue</button>
+        <button class="btn-continue" *ngIf="step2" (click)="gotoStep3();">Proceed</button>
+        <button class="btn-continue" *ngIf="step3" (click)="gotoStep4();">Confirm Password</button>
+    </div>
+</form>
+
+<!-- this is the modal need to be developed -->
+<ng-container *ngIf="step4">
+    <app-modal modalBody="Account created Successfully" modalTitle="Account Created" [openModalCondition]=true [showConfirmButton]="false"
+        (closeModal)="modalEvent($event)"></app-modal>
+</ng-container>
+
+<ng-container *ngIf="incorrectMatch">
+    <app-modal modalBody="Passwords doesn't match." modalTitle="Incorrect Password" [openModalCondition]=true [showConfirmButton]="false"
+        (closeModal)="modalEvent($event)"></app-modal>
+</ng-container>

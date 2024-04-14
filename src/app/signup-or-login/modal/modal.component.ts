@@ -8,6 +8,7 @@ declare var $: any;
 
 export class ModalComponent {
   @Input() modalBody:string='Into the modal';
+  @Input() showConfirmButton: boolean = true
   @Input() openModalCondition:boolean=false
   @Input() modalTitle:string='this is the modal'
   @Output() closeModal=new EventEmitter<boolean>();

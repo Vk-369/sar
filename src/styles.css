@@ -1,6 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
 
 
+.is-error{
+    color: red;
+    font-size: smaller;
+    margin-bottom: -10px;
+}
+
 html, body {
     padding: 0px;
     margin: 0px;
