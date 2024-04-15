@@ -12,8 +12,8 @@
           {{modalBody}}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeEvent()">Close</button>
-          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="closeEvent()" *ngIf="showConfirmButton">Save changes</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeEvent()" *ngIf="showClose">Close</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent()" *ngIf="showConfirmButton">{{confirmContent}}</button>
         </div>
       </div>
     </div>

@@ -106,8 +106,8 @@
 
 <!-- this is the modal need to be developed -->
 <ng-container *ngIf="step4">
-    <app-modal modalBody="Account created Successfully" modalTitle="Account Created" [openModalCondition]=true [showConfirmButton]="false"
-        (closeModal)="modalEvent($event)"></app-modal>
+    <app-modal modalBody="Account created Successfully" modalTitle="Account Created" [openModalCondition]=true [showClose]="false" [confirmContent]="'Verify account'"
+        (confirmModal)="confirmEvent($event)" (closeModal)="modalEvent($event)"></app-modal>
 </ng-container>
 
 <ng-container *ngIf="incorrectMatch">

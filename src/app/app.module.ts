@@ -12,6 +12,7 @@ import { EmpProComponent } from './emp-pro/emp-pro.component';
 import { ModalComponent } from './signup-or-login/modal/modal.component';
 import { LoginScreenComponent } from './signup-or-login/login-screen/login-screen.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { OtpComponent } from './signup-or-login/otp/otp.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     EmpProComponent,
     ModalComponent,
     LoginScreenComponent,
+    OtpComponent,
   ],
   imports: [
     BrowserModule,

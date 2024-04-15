@@ -20,7 +20,7 @@ export class SignUpDetalilsEntryComponent {
   fragment: any = {}
   signupForm!: FormGroup;
   blurControls: any = {}
-  passwordStrength: any = {charLength: false, specialChar: false, digit: false, capitalChar: false}
+  passwordStrength: any = { charLength: false, specialChar: false, digit: false, capitalChar: false }
 
   constructor(
     private router: Router,
@@ -53,11 +53,11 @@ export class SignUpDetalilsEntryComponent {
     this.signupForm.get(control)?.updateValueAndValidity()
   }
 
-  onBlur(control: string){
+  onBlur(control: string) {
     this.blurControls[control] = true
   }
 
-  passwordComplexity(event: Event){
+  passwordComplexity(event: Event) {
     this.passwordStrength.charLength = this.signupForm.get('password')?.value.length > 7
     this.passwordStrength.capitalChar = /[A-Z]/.test(this.signupForm.get('password')?.value)
     this.passwordStrength.digit = /[0-9]/.test(this.signupForm.get('password')?.value)
@@ -92,12 +92,14 @@ export class SignUpDetalilsEntryComponent {
   gotoStep4() {
     this.incorrectMatch = false
     console.log(this.signupForm.get('password')?.value, this.signupForm.get('repassword')?.value)
-    this.incorrectMatch = this.signupForm.get('password')?.value != this.signupForm.get('repassword')?.value
-    if(this.incorrectMatch){
+    this.incorrectMatch = !(this.signupForm.get('password')?.value === this.signupForm.get('repassword')?.value)
+    if (this.incorrectMatch) {
+      console.log(this.incorrectMatch, this.step4)
       this.resetValue('repassword')
       return
     }
     this.step4 = true
+    console.log(this.step4)
   }
 
   back() {
@@ -115,13 +117,21 @@ export class SignUpDetalilsEntryComponent {
     }
   }
 
+  confirmEvent(event: boolean) {
+    this.step4 = false
+    const mail = this._sarService.encodeParams({ mail_id: this.signupForm.get('mail_id')?.value })
+    this.router.navigate(['/verify'], { fragment: mail })
+  }
+
   modalEvent(e: any) {
-    if(this.incorrectMatch){
+    this.step4 = false
+    if (this.incorrectMatch) {
+      console.log(this.incorrectMatch)
       this.incorrectMatch = false
       return
     }
-    this.step4 = false
-    this.router.navigate(['/verify'], {fragment: this.signupForm.get('mail_id')?.value})
+    console.log('navigate')
+    this.router.navigate([''])
   }
 
 }

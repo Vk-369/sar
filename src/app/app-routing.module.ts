@@ -6,6 +6,7 @@ import { SignUpDetalilsEntryComponent } from './signup-or-login/sign-up-detalils
 import { ChatScreenComponent } from './chat-screen/chat-screen.component';
 import { MusicPlayerMainComponent } from './music-player-main/music-player-main.component';
 import { LoginScreenComponent } from './signup-or-login/login-screen/login-screen.component';
+import { OtpComponent } from './signup-or-login/otp/otp.component';
 
 const routes: Routes = [
   {path:'',component:SignupOrLoginComponent},
@@ -13,6 +14,7 @@ const routes: Routes = [
   {path:'enterDetails',component:SignUpDetalilsEntryComponent},
   {path:'login',component:LoginScreenComponent},
   {path:'musicPlayer',component:MusicPlayerMainComponent},
+  {path:'verify',component:OtpComponent}
   // {path:'',component:ChatScreenComponent},
 
  

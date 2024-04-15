@@ -7,27 +7,33 @@ declare var $: any;
 })
 
 export class ModalComponent {
-  @Input() modalBody:string='Into the modal';
+  @Input() modalBody: string = 'Into the modal';
   @Input() showConfirmButton: boolean = true
-  @Input() openModalCondition:boolean=false
-  @Input() modalTitle:string='this is the modal'
-  @Output() closeModal=new EventEmitter<boolean>();
-ngOnInit()
-{
-  console.log("modal has been initialized bro")
-}
-ngOnChanges(changes: SimpleChanges)
-{
-console.log(changes)
-console.log(this.modalBody,'this is the modal body comming from the parent',this.openModalCondition)
-this.openModalCondition ? this.modalToggle('show') : this.modalToggle('hide')
-}
+  @Input() openModalCondition: boolean = false
+  @Input() showClose: boolean = true
+  @Input() confirmContent: string = 'Save changes'
+  @Input() modalTitle: string = 'this is the modal'
+  @Output() closeModal = new EventEmitter<boolean>();
+  @Output() confirmModal = new EventEmitter<boolean>();
 
-modalToggle(item:any) {
-  $('#exampleModalCenter').modal(item);
-}
-closeEvent()
-{
-  this.closeModal.emit(true)
-}
+  ngOnInit() {
+    console.log("modal has been initialized bro")
+  }
+  ngOnChanges(changes: SimpleChanges) {
+    console.log(changes)
+    console.log(this.modalBody, this.openModalCondition)
+    this.openModalCondition ? this.modalToggle('show') : this.modalToggle('hide')
+  }
+
+  modalToggle(item: any) {
+    $('#exampleModalCenter').modal(item);
+  }
+  closeEvent() {
+    console.log('emit')
+    this.closeModal.emit(true)
+  }
+
+  confirmEvent() {
+    this.confirmModal.emit(true)
+  }
 }
