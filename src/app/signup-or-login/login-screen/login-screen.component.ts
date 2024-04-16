@@ -64,7 +64,7 @@ export class LoginScreenComponent {
         Validators.minLength(8),
         Validators.maxLength(60),
         Validators.pattern(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{4,}$'
+          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#@$!%*?&]).{4,}$'
         ),
       ]),
       repassword: new FormControl('', [
@@ -84,7 +84,7 @@ export class LoginScreenComponent {
     this.passwordStrength.digit = /[0-9]/.test(
       this.resetForm.get('password')?.value
     );
-    this.passwordStrength.specialChar = /[@$!%*?&]/.test(
+    this.passwordStrength.specialChar = /[#@$!%*?&]/.test(
       this.resetForm.get('password')?.value
     );
   }

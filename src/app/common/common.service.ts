@@ -67,15 +67,17 @@ export class CommonService {
   }): Observable<any> {
     switch (method.toUpperCase()) {
       case 'LOGIN':
+        console.log(url, {
+          edc: this._sarService.encrypt(JSON.stringify(body)),
+        })
         return this._http
           .post(url, {
-            body: this._sarService.encodeParams(JSON.stringify(body)),
+            edc: this._sarService.encrypt(JSON.stringify(body)),
           })
           .pipe(
             catchError((error) => {
-              if (error.status === 401) {
-                console.log(error);
-              }
+              console.log(error);
+              
               return of(false);
             })
           );

@@ -14,6 +14,7 @@ import { LoginScreenComponent } from './signup-or-login/login-screen/login-scree
 import { ReactiveFormsModule } from '@angular/forms';
 import { OtpComponent } from './signup-or-login/otp/otp.component';
 import { SignupLoginService } from './signup-or-login/signup-login.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,7 @@ import { SignupLoginService } from './signup-or-login/signup-login.service';
     LoginScreenComponent,
     OtpComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, HttpClientModule],
   providers: [SignupLoginService],
   bootstrap: [AppComponent],
 })

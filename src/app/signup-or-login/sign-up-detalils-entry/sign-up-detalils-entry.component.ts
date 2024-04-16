@@ -26,14 +26,16 @@ export class SignUpDetalilsEntryComponent {
     digit: false,
     capitalChar: false,
   };
+  existingUser: boolean = false
+  modalText: string = ''
 
   constructor(
-    private router: Router,
+    private _router: Router,
     private _sarService: SarServiceService,
     public commonService: CommonService,
     private _route: ActivatedRoute,
-    private _signupLoginservice: SignupLoginService
-  ) {}
+    private _signupLoginService: SignupLoginService
+  ) { }
 
   ngOnInit(): void {
     this._route.fragment.subscribe((fragment) => {
@@ -62,7 +64,7 @@ export class SignUpDetalilsEntryComponent {
         Validators.minLength(8),
         Validators.maxLength(60),
         Validators.pattern(
-          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{4,}$'
+          '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[#@$!%*?&]).{4,}$'
         ),
       ]),
       repassword: new FormControl('', [
@@ -92,7 +94,7 @@ export class SignUpDetalilsEntryComponent {
     this.passwordStrength.digit = /[0-9]/.test(
       this.signupForm.get('password')?.value
     );
-    this.passwordStrength.specialChar = /[@$!%*?&]/.test(
+    this.passwordStrength.specialChar = /[#@$!%*?&]/.test(
       this.signupForm.get('password')?.value
     );
   }
@@ -111,14 +113,31 @@ export class SignUpDetalilsEntryComponent {
       this.onBlur('phone_no');
       return;
     }
-    this._signupLoginservice
+    console.log(this.signupForm.get('mail_id')?.value)
+    this._signupLoginService
       .checkMailExists({ mail_id: this.signupForm.get('mail_id')?.value })
       .subscribe((response) => {
         console.log(response);
+        response = this._sarService.decrypt(response.edc)
+        console.log(response)
+        if (response.success) {
+          if (response.verify === 'no') {
+            this.step1 = false;
+            this.step2 = true;
+            this.step3 = false;
+          } else if (response.verify === 'yes') {
+            this.step4 = true;
+            this.modalText = response.message
+            // console.log(this.signupForm.get('mail_id')?.value)
+            // const mail = this._sarService.encodeParams({
+            //   mail_id: this.signupForm.get('mail_id')?.value,
+            // });
+            // this._router.navigate(['/verify'], { fragment: mail })
+          } else {
+
+          }
+        }
       });
-    this.step1 = false;
-    this.step2 = true;
-    this.step3 = false;
   }
 
   gotoStep3() {
@@ -133,10 +152,6 @@ export class SignUpDetalilsEntryComponent {
 
   gotoStep4() {
     this.incorrectMatch = false;
-    console.log(
-      this.signupForm.get('password')?.value,
-      this.signupForm.get('repassword')?.value
-    );
     this.incorrectMatch = !(
       this.signupForm.get('password')?.value ===
       this.signupForm.get('repassword')?.value
@@ -147,15 +162,30 @@ export class SignUpDetalilsEntryComponent {
       return;
     }
     const body = {
+      user_id: null,
       mail_id: this.signupForm.value.mail_id,
       password: this.signupForm.value.password,
       username: this.signupForm.value.username,
+      gender: this.fragment.gender,
+      phone_no: this.signupForm.value.phone_no
     };
-    this._signupLoginservice.signupNewUser(body).subscribe((response) => {
+    console.log(body)
+    this._signupLoginService.signupNewUser(body).subscribe((response) => {
       console.log(response);
+      response = this._sarService.decrypt(response.edc)
+      console.log(response);
+      if (response.success) {
+        if (response.verify === 'yes') {
+          this.step4 = true;
+          this.modalText = response.message
+        } else if (response.verify === 'no') {
+          this.step4 = true;
+          this.modalText = response.message
+        } else {
+          this.existingUser = true
+        }
+      }
     });
-    this.step4 = true;
-    console.log(this.step4);
   }
 
   back() {
@@ -168,7 +198,7 @@ export class SignUpDetalilsEntryComponent {
       this.step2 = false;
       this.step1 = true;
     } else {
-      this.router.navigate(['/signUp']);
+      this._router.navigate(['/signUp']);
       console.log('baack');
     }
   }
@@ -178,7 +208,8 @@ export class SignUpDetalilsEntryComponent {
     const mail = this._sarService.encodeParams({
       mail_id: this.signupForm.get('mail_id')?.value,
     });
-    this.router.navigate(['/verify'], { fragment: mail });
+    console.log(mail, this.signupForm.get('mail_id')?.value)
+    this._router.navigate(['/verify'], { fragment: mail });
   }
 
   modalEvent(e: any) {
@@ -189,6 +220,10 @@ export class SignUpDetalilsEntryComponent {
       return;
     }
     console.log('navigate');
-    this.router.navigate(['']);
+    this._router.navigate(['']);
+  }
+
+  loginEvent(event: boolean) {
+    this._router.navigate(['./login'])
   }
 }
