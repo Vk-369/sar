@@ -13,6 +13,7 @@ import { ModalComponent } from './signup-or-login/modal/modal.component';
 import { LoginScreenComponent } from './signup-or-login/login-screen/login-screen.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OtpComponent } from './signup-or-login/otp/otp.component';
+import { SignupLoginService } from './signup-or-login/signup-login.service';
 
 @NgModule({
   declarations: [
@@ -27,12 +28,8 @@ import { OtpComponent } from './signup-or-login/otp/otp.component';
     LoginScreenComponent,
     OtpComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
+  providers: [SignupLoginService],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
