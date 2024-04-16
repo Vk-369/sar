@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SarServiceService } from '../sar-service.service';
+import { SarServiceService } from '../../sar-service.service';
 
 @Component({
   selector: 'app-sign-up-page',
@@ -10,12 +10,15 @@ import { SarServiceService } from '../sar-service.service';
 
 
 export class SignUpPageComponent {
+
+  itemSelected: string = 'men';
+
   constructor(
     private router: Router,
     private _sarService:SarServiceService,
     private _activatedRoute:ActivatedRoute
   ) {}
-  itemSelected: string = 'men';
+
   ngOnInit(): void {
     this._activatedRoute.fragment.subscribe((params:any)=>
     {
@@ -27,26 +30,29 @@ export class SignUpPageComponent {
     })
     this.encode() 
   }
+
   selectedCard(value: any){
     if(this.itemSelected!=value)
     {
       this.itemSelected = value;
       console.log(this.itemSelected,'into the selected card',value)
-      this.encode()
     }
   }
+
   backToSplash()
   {
     this.router.navigate(['/']);
   }
+
   detailsScreen()
   {
-    this.router.navigate(['/enterDetails']);
+    const gender=this._sarService.encodeParams({gender:this.itemSelected})
+    this.router.navigate(['/enterDetails'], {fragment:gender});
   }
+
   encode()
   {
     const gender=this._sarService.encodeParams({gender:this.itemSelected})
     this.router.navigate(['/signUp'], {fragment:gender});
-
   }
 }
