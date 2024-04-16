@@ -51,5 +51,6 @@
 </div>
 <ng-container *ngIf="verifySuccess">
     <app-modal [modalBody]="'Account Verified Successfully.'" [modalTitle]="'Verification status'" [showClose]="false"
-        [confirmContent]="'Login'" [openModalCondition]=true (confirmModal)="modalEvent($event)" (closeModal)="back()"></app-modal>
+        [confirmContent]="modalButton" [openModalCondition]=true (confirmModal)="confirmModal($event)"
+        (closeModal)="back()"></app-modal>
 </ng-container>
