@@ -26,8 +26,8 @@ export class SignUpDetalilsEntryComponent {
     digit: false,
     capitalChar: false,
   };
-  existingUser: boolean = false
-  modalText: string = ''
+  existingUser: boolean = false;
+  modalText: string = '';
 
   constructor(
     private _router: Router,
@@ -35,7 +35,7 @@ export class SignUpDetalilsEntryComponent {
     public commonService: CommonService,
     private _route: ActivatedRoute,
     private _signupLoginService: SignupLoginService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this._route.fragment.subscribe((fragment) => {
@@ -113,13 +113,13 @@ export class SignUpDetalilsEntryComponent {
       this.onBlur('phone_no');
       return;
     }
-    console.log(this.signupForm.get('mail_id')?.value)
+    console.log(this.signupForm.get('mail_id')?.value);
     this._signupLoginService
       .checkMailExists({ mail_id: this.signupForm.get('mail_id')?.value })
       .subscribe((response) => {
         console.log(response);
-        response = this._sarService.decrypt(response.edc)
-        console.log(response)
+        response = this._sarService.decrypt(response.edc);
+        console.log(response);
         if (response.success) {
           if (response.verify === 'no') {
             this.step1 = false;
@@ -127,14 +127,9 @@ export class SignUpDetalilsEntryComponent {
             this.step3 = false;
           } else if (response.verify === 'yes') {
             this.step4 = true;
-            this.modalText = response.message
-            // console.log(this.signupForm.get('mail_id')?.value)
-            // const mail = this._sarService.encodeParams({
-            //   mail_id: this.signupForm.get('mail_id')?.value,
-            // });
-            // this._router.navigate(['/verify'], { fragment: mail })
+            this.modalText = response.message;
           } else {
-
+            this.existingUser = true;
           }
         }
       });
@@ -167,22 +162,22 @@ export class SignUpDetalilsEntryComponent {
       password: this.signupForm.value.password,
       username: this.signupForm.value.username,
       gender: this.fragment.gender,
-      phone_no: this.signupForm.value.phone_no
+      phone_no: this.signupForm.value.phone_no,
     };
-    console.log(body)
+    console.log(body);
     this._signupLoginService.signupNewUser(body).subscribe((response) => {
       console.log(response);
-      response = this._sarService.decrypt(response.edc)
+      response = this._sarService.decrypt(response.edc);
       console.log(response);
       if (response.success) {
         if (response.verify === 'yes') {
           this.step4 = true;
-          this.modalText = response.message
+          this.modalText = response.message;
         } else if (response.verify === 'no') {
           this.step4 = true;
-          this.modalText = response.message
+          this.modalText = response.message;
         } else {
-          this.existingUser = true
+          this.existingUser = true;
         }
       }
     });
@@ -208,7 +203,7 @@ export class SignUpDetalilsEntryComponent {
     const mail = this._sarService.encodeParams({
       mail_id: this.signupForm.get('mail_id')?.value,
     });
-    console.log(mail, this.signupForm.get('mail_id')?.value)
+    console.log(mail, this.signupForm.get('mail_id')?.value);
     this._router.navigate(['/verify'], { fragment: mail });
   }
 
@@ -224,6 +219,6 @@ export class SignUpDetalilsEntryComponent {
   }
 
   loginEvent(event: boolean) {
-    this._router.navigate(['./login'])
+    this._router.navigate(['./login']);
   }
 }

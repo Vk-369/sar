@@ -7,3 +7,8 @@ export interface NewSignup {
   password: string;
   username: string;
 }
+
+export interface OtpVerify {
+  mail_id: string;
+  otp: string;
+}
