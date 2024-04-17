@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SarServiceService } from 'src/app/sar-service.service';
+import { SignupLoginService } from '../signup-login.service';
 
 @Component({
   selector: 'app-otp',
@@ -13,12 +14,14 @@ export class OtpComponent {
   verifySuccess: boolean = false;
   fragment: any = {};
 
-  modalButton = 'Login';
+  modalButton: string = 'Login';
+  modalText: string = '';
 
   constructor(
     private _router: Router,
     private _route: ActivatedRoute,
-    private _sarService: SarServiceService
+    private _sarService: SarServiceService,
+    private _signupLoginService: SignupLoginService
   ) {}
 
   ngOnInit() {
@@ -46,7 +49,28 @@ export class OtpComponent {
     if (this.otpForm.invalid) {
       return;
     }
-    this.verifySuccess = true;
+    const value = this.otpForm.value;
+    const otp = value.digit1 + value.digit2 + value.digit3 + value.digit4;
+    const body = {
+      mail_id: this.fragment.mail_id,
+      otp,
+    };
+    this._signupLoginService.verifySignupOtp(body).subscribe((response) => {
+      console.log(response);
+      response = this._sarService.decrypt(response.edc);
+      console.log(response);
+      if (response.success) {
+        this.modalText = response.message;
+        this.verifySuccess = true;
+        if (response.status === 2) {
+          this.modalButton = 'Login';
+        } else if (response.status === 1) {
+          this.modalButton = 'Resent OTP';
+        } else {
+          this.modalButton = 'Signup';
+        }
+      }
+    });
   }
 
   singleDigit(control: string) {
@@ -60,12 +84,25 @@ export class OtpComponent {
   }
 
   resendOtp() {
-    this.otpForm.reset();
+    this._signupLoginService
+      .resendOTP({ mail_id: this.fragment.mail_id })
+      .subscribe((response) => {
+        response = this._sarService.decrypt(response.edc);
+        console.log(response);
+        if (response.success) {
+          this.otpForm.reset();
+        }
+      });
   }
 
   confirmModal(event: boolean) {
-    const frag = this._sarService.encodeParams({ ...this.fragment });
-    this._router.navigate(['/login'], { fragment: frag });
+    if (this.modalButton === 'Login') {
+      const frag = this._sarService.encodeParams({ ...this.fragment });
+      this._router.navigate(['/login'], { fragment: frag });
+    } else if (this.modalButton === 'Resent OTP') {
+    } else {
+      this._router.navigate(['/signUp']);
+    }
   }
 
   back() {

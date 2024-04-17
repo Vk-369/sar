@@ -50,7 +50,7 @@
     <button class="btn-continue" (click)="onVerifyOtp()">Verify</button>
 </div>
 <ng-container *ngIf="verifySuccess">
-    <app-modal [modalBody]="'Account Verified Successfully.'" [modalTitle]="'Verification status'" [showClose]="false"
+    <app-modal [modalBody]="modalText" [modalTitle]="'Verification status'" [showClose]="false"
         [confirmContent]="modalButton" [openModalCondition]=true (confirmModal)="confirmModal($event)"
         (closeModal)="back()"></app-modal>
 </ng-container>
