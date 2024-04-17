@@ -26,6 +26,9 @@
                         *ngIf="blurControls['password'] && commonService.isValidControl(loginForm, 'password')">
                         {{commonService.getErrorMsg(loginForm, 'password', 'Password')}}
                     </p>
+                    <p class="is-error"
+                        *ngIf="wrongCreds && !(blurControls['password'] && commonService.isValidControl(loginForm, 'password'))">
+                        {{wrongCreds}}</p>
                 </div>
             </div>
             <div class="input-card">
@@ -139,4 +142,9 @@
 <ng-container *ngIf="incorrectMatch">
     <app-modal modalBody="Passwords doesn't match." modalTitle="Incorrect Password" [openModalCondition]=true
         [showConfirmButton]="false" (closeModal)="modalEvent($event)"></app-modal>
+</ng-container>
+<ng-container *ngIf="verify">
+    <app-modal modalBody="User not verified." modalTitle="Account status" [openModalCondition]=true
+        [confirmContent]="'Verify OTP'" (closeModal)="modalEvent($event)"
+        (confirmModal)="sendOtp(); this.otpType='verify'"></app-modal>
 </ng-container>

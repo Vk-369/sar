@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonService } from 'src/app/common/common.service';
 import { SarServiceService } from 'src/app/sar-service.service';
+import { SignupLoginService } from '../signup-login.service';
 
 @Component({
   selector: 'app-login-screen',
@@ -28,12 +29,16 @@ export class LoginScreenComponent {
     digit: false,
     capitalChar: false,
   };
+  wrongCreds: string = '';
+  verify: boolean = false;
+  otpType: string = '';
 
   constructor(
     private _router: Router,
     private _route: ActivatedRoute,
     public commonService: CommonService,
-    private _sarService: SarServiceService
+    private _sarService: SarServiceService,
+    private _signupLoginService: SignupLoginService
   ) {}
 
   ngOnInit() {
@@ -91,6 +96,7 @@ export class LoginScreenComponent {
 
   onBlur(control: string) {
     this.blurControls[control] = true;
+    this.wrongCreds = '';
   }
 
   gotoConfirm() {
@@ -118,12 +124,22 @@ export class LoginScreenComponent {
       this.resetForm.get('repassword')?.updateValueAndValidity();
       return;
     }
-    this.openModal = true;
+    const body = {
+      mail_id: this.fragment.mail_id,
+      password: this.resetForm.value.password,
+    };
+    this._signupLoginService.changePassword(body).subscribe((response) => {
+      response = this._sarService.encrypt(response.edc);
+      if (response.success) {
+        this.openModal = true;
+      }
+    });
   }
 
   resetPassword() {
     this.isResetClicked = true;
     this.blurControls.mail_id = false;
+    this.otpType = 'reset password';
   }
 
   authenticate() {
@@ -134,7 +150,25 @@ export class LoginScreenComponent {
       this.loginForm.markAllAsTouched();
       return;
     }
-    this._router.navigate(['/musicPlayer']);
+    const body = {
+      mail_id: this.loginForm.value.mail_id,
+      password: this.loginForm.value.password,
+    };
+    this._signupLoginService.loginUser(body).subscribe((response) => {
+      response = this._sarService.decrypt(response.edc);
+      console.log(response);
+      if (response.success) {
+        if (response.login === 'success') {
+          sessionStorage.setItem('token', response.token);
+          this._router.navigate(['/musicPlayer']);
+        } else if (response.login === 'verify') {
+          this.verify = true;
+        } else {
+          this.wrongCreds = response.message;
+          this.loginForm.get('password')?.reset();
+        }
+      }
+    });
     console.log('into the authentication');
   }
 
@@ -143,14 +177,39 @@ export class LoginScreenComponent {
       this.onBlur('mail_id');
       return;
     }
-    const mail = this._sarService.encodeParams({
-      mail_id: this.loginForm.get('mail_id')?.value,
-      type: 'reset password',
-    });
-    this._router.navigate(['/verify'], { fragment: mail });
+    this._signupLoginService
+      .resendOTP({ mail_id: this.loginForm.value.mail_id })
+      .subscribe((response) => {
+        response = this._sarService.decrypt(response.edc);
+        console.log(response);
+        if (response.success) {
+          const mail = this._sarService.encodeParams({
+            mail_id: this.loginForm.get('mail_id')?.value,
+            type: this.otpType,
+          });
+          this._router.navigate(['/verify'], { fragment: mail });
+        }
+      });
   }
 
+  // verifyMail() {
+  //   this.otpType = 'verify';
+  //   if (this.loginForm.get('mail_id')?.invalid) {
+  //     this.onBlur('mail_id');
+  //     return;
+  //   }
+  //   const mail = this._sarService.encodeParams({
+  //     mail_id: this.loginForm.get('mail_id')?.value,
+  //     type: this.otpType,
+  //   });
+  //   this._router.navigate(['/verify'], { fragment: mail });
+  // }
+
   back() {
+    if (this.inReset) {
+      this.inReset = false;
+      return;
+    }
     if (this.isResetClicked) {
       this.loginForm.reset();
       this.isResetClicked = false;

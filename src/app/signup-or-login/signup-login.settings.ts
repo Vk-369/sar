@@ -6,5 +6,8 @@ export class SignupLoginSettings {
     SIGNUP_USER: env.apiUrl + `/signup/user`,
     VERIFY_OTP_SIGNUP: env.apiUrl + `/signup/verify/otp`,
     RESEND_OTP: env.apiUrl + `/resend/otp`,
+    RESET_PASSWORD: env.apiUrl + `/change/password`,
+
+    LOGIN_USER: env.apiUrl + `/login/user`,
   };
 }
