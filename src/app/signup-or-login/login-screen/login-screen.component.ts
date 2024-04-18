@@ -204,19 +204,6 @@ export class LoginScreenComponent {
       });
   }
 
-  // verifyMail() {
-  //   this.otpType = 'verify';
-  //   if (this.loginForm.get('mail_id')?.invalid) {
-  //     this.onBlur('mail_id');
-  //     return;
-  //   }
-  //   const mail = this._sarService.encodeParams({
-  //     mail_id: this.loginForm.get('mail_id')?.value,
-  //     type: this.otpType,
-  //   });
-  //   this._router.navigate(['/verify'], { fragment: mail });
-  // }
-
   back() {
     if (this.inReset) {
       this.inReset = false;
