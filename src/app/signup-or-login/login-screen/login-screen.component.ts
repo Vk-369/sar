@@ -32,6 +32,9 @@ export class LoginScreenComponent {
   wrongCreds: string = '';
   verify: boolean = false;
   otpType: string = '';
+  confirmButton: string = '';
+  confirmText: string = '';
+  noUser: boolean = false;
 
   constructor(
     private _router: Router,
@@ -109,6 +112,7 @@ export class LoginScreenComponent {
 
   resetConfirm() {
     this.incorrectMatch = false;
+    this.openModal = false;
     if (this.resetForm.get('repassword')?.invalid) {
       this.blurControls.repassword = true;
       this.resetForm.markAllAsTouched();
@@ -129,9 +133,11 @@ export class LoginScreenComponent {
       password: this.resetForm.value.password,
     };
     this._signupLoginService.changePassword(body).subscribe((response) => {
-      response = this._sarService.encrypt(response.edc);
+      response = this._sarService.decrypt(response.edc);
       if (response.success) {
         this.openModal = true;
+        this.confirmButton = 'Login';
+        this.confirmText = response.message;
       }
     });
   }
@@ -183,11 +189,17 @@ export class LoginScreenComponent {
         response = this._sarService.decrypt(response.edc);
         console.log(response);
         if (response.success) {
-          const mail = this._sarService.encodeParams({
-            mail_id: this.loginForm.get('mail_id')?.value,
-            type: this.otpType,
-          });
-          this._router.navigate(['/verify'], { fragment: mail });
+          if (response.otp) {
+            const mail = this._sarService.encodeParams({
+              mail_id: this.loginForm.get('mail_id')?.value,
+              type: this.otpType,
+            });
+            this._router.navigate(['/verify'], { fragment: mail });
+          } else {
+            this.noUser = true;
+            this.confirmButton = 'Signup';
+            this.confirmText = response.message;
+          }
         }
       });
   }
@@ -231,6 +243,10 @@ export class LoginScreenComponent {
   confirmEvent(event: boolean) {
     this.resetMode = false;
     this.resetForm.reset();
-    this._router.navigate(['/login']);
+    this._router.navigate([`/login`]);
+  }
+
+  signupEvent(event: boolean) {
+    this._router.navigate(['/signUp']);
   }
 }

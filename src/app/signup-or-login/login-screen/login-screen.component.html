@@ -135,9 +135,14 @@
     </div>
 </div>
 <ng-container *ngIf="openModal">
-    <app-modal [modalBody]="'Password reset successful.'" [modalTitle]="'Reset status'" [openModalCondition]=true
-        [showClose]="false" [confirmContent]="'Login'" (closeModal)="modalEvent($event)"
+    <app-modal [modalBody]="confirmText" [modalTitle]="'Reset status'" [openModalCondition]=true [showClose]="false"
+        [confirmContent]="confirmButton" (closeModal)="modalEvent($event)"
         (confirmModal)="confirmEvent($event)"></app-modal>
+</ng-container>
+<ng-container *ngIf="noUser">
+    <app-modal [modalBody]="confirmText" [modalTitle]="'Reset status'" [openModalCondition]=true [showClose]="false"
+        [confirmContent]="confirmButton" (closeModal)="modalEvent($event)"
+        (confirmModal)="signupEvent($event)"></app-modal>
 </ng-container>
 <ng-container *ngIf="incorrectMatch">
     <app-modal modalBody="Passwords doesn't match." modalTitle="Incorrect Password" [openModalCondition]=true
