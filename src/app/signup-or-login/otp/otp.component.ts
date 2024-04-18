@@ -30,10 +30,12 @@ export class OtpComponent {
         this.fragment = this._sarService.decodeParams(fragment);
         if (this.fragment.type === 'reset password') {
           // this.resendOtp();
-          this.modalButton = 'Set password';
+          this.modalButton = 'Reset password';
         } else if (this.fragment.type === 'verify') {
           this.modalButton = 'Login';
           // this.resendOtp();
+        } else {
+          this.modalButton = 'Login';
         }
       }
     });
@@ -66,13 +68,12 @@ export class OtpComponent {
       if (response.success) {
         this.modalText = response.message;
         this.verifySuccess = true;
-        if (response.status === 2) {
+        this.modalButton = response.operation;
+        if (
+          response.operation === 'Login' &&
+          this.fragment.type === 'reset password'
+        ) {
           this.modalButton = 'Reset password';
-          return;
-        } else if (response.status === 1) {
-          this.modalButton = 'Retry';
-        } else {
-          this.modalButton = 'Signup';
         }
       }
     });
