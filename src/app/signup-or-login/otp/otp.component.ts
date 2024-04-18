@@ -29,7 +29,11 @@ export class OtpComponent {
       if (fragment) {
         this.fragment = this._sarService.decodeParams(fragment);
         if (this.fragment.type === 'reset password') {
+          // this.resendOtp();
           this.modalButton = 'Set password';
+        } else if (this.fragment.type === 'verify') {
+          this.modalButton = 'Login';
+          // this.resendOtp();
         }
       }
     });
@@ -63,9 +67,10 @@ export class OtpComponent {
         this.modalText = response.message;
         this.verifySuccess = true;
         if (response.status === 2) {
-          this.modalButton = 'Login';
+          this.modalButton = 'Reset password';
+          return;
         } else if (response.status === 1) {
-          this.modalButton = 'Resent OTP';
+          this.modalButton = 'Retry';
         } else {
           this.modalButton = 'Signup';
         }
@@ -96,10 +101,12 @@ export class OtpComponent {
   }
 
   confirmModal(event: boolean) {
-    if (this.modalButton === 'Login') {
+    this.verifySuccess = false;
+    if (this.modalButton === 'Login' || this.modalButton === 'Reset password') {
       const frag = this._sarService.encodeParams({ ...this.fragment });
       this._router.navigate(['/login'], { fragment: frag });
-    } else if (this.modalButton === 'Resent OTP') {
+    } else if (this.modalButton === 'Retry') {
+      this.otpForm.reset();
     } else {
       this._router.navigate(['/signUp']);
     }

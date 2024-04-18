@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Mail, NewSignup, OtpVerify } from './signup-login.interface';
+import { Login, Mail, NewSignup, OtpVerify } from './signup-login.interface';
 import { SignupLoginSettings } from './signup-login.settings';
 import { CommonService } from '../common/common.service';
 
@@ -27,6 +27,16 @@ export class SignupLoginService {
 
   resendOTP(body: Mail) {
     const url = SignupLoginSettings.API.RESEND_OTP;
+    return this._commonService.callApi({ url, method: 'LOGIN', body });
+  }
+
+  loginUser(body: Login) {
+    const url = SignupLoginSettings.API.LOGIN_USER;
+    return this._commonService.callApi({ url, method: 'LOGIN', body });
+  }
+
+  changePassword(body: Login) {
+    const url = SignupLoginSettings.API.RESET_PASSWORD;
     return this._commonService.callApi({ url, method: 'LOGIN', body });
   }
 }
