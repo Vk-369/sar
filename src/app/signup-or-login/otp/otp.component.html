@@ -1,0 +1,56 @@
+<div class="back-icon" (click)="back()">
+    <img src="assets/images/login/back.png" alt="login image backgroung">
+</div>
+<div class="main">
+    <div class="main-card">
+        <div class="step-class">
+            STEP :3/7
+        </div>
+        <div class="set-password-text">
+            Verify Account
+        </div>
+        <div class="text-alignment-class change-color">
+            Enter OTP
+        </div>
+        <!-- <div class="input-card" >
+            <input type="text" class="form-controlOne" placeholder="Enter User Name">
+            <input type="password" class="form-controlOne" placeholder="Enter password">
+        </div> -->
+        <div class="input-card">
+            <!-- <input type="text" class="form-controlOne"
+                placeholder="Registered Gmail"> -->
+            <form [formGroup]="otpForm">
+                <div>
+                    <input type="text" #digit1 type='number' class="digit-box" autofocus
+                        (input)="singleDigit('digit1');digit2.focus()" formControlName="digit1">
+                    <input type="text" #digit2 type='number' class="digit-box"
+                        (input)="singleDigit('digit2');digit3.focus()" formControlName="digit2">
+                    <input type="text" #digit3 type='number' class="digit-box"
+                        (input)="singleDigit('digit3');digit4.focus()" formControlName="digit3">
+                    <input type="text" #digit4 type='number' class="digit-box" (input)="singleDigit('digit4')"
+                        formControlName="digit4">
+                    <!-- <input type="text" type='number' class="digit-box"> -->
+                </div>
+            </form>
+        </div>
+        <!-- <div class="forgot-password" >
+            forgot password ?<span class="resetBtn" > reset</span>
+        </div> -->
+        <div class="forgot-password">
+            Didn't received code?<span class="resetBtn" (click)="resendOtp()"> Resend</span>
+        </div>
+    </div>
+
+    <div class="sign-up-logo">
+        <img src="assets/images/login/login details.svg" alt="Sign up Image Background">
+    </div>
+
+    <!-- <button class="btn-continue" >Continue</button>
+    <button class="btn-continue"  >ContinueAuth</button> -->
+    <button class="btn-continue" (click)="onVerifyOtp()">Verify</button>
+</div>
+<ng-container *ngIf="verifySuccess">
+    <app-modal [modalBody]="modalText" [modalTitle]="'Verification status'" [showClose]="false"
+        [confirmContent]="modalButton" [openModalCondition]=true (confirmModal)="confirmModal($event)"
+        (closeModal)="back()"></app-modal>
+</ng-container>
