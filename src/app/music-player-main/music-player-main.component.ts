@@ -2,6 +2,8 @@
 import { Component, OnInit } from '@angular/core';
 import 'owl.carousel'; // Import Owl Carousel library
 import * as $ from 'jquery';
+import { SignupLoginService } from '../signup-or-login/signup-login.service';
+import { SarServiceService } from '../sar-service.service';
 
 // Extend the JQuery interface to include the owlCarousel method
 
@@ -19,8 +21,35 @@ export class MusicPlayerMainComponent implements OnInit {
   searchType: any = false;
   optionsList: any = [];
   userProf:boolean=false
+  recommendations:any=[]
+  base64String: any=String
+  audioUrl:any= String;
+
+  
+  constructor(
+    private _sarService: SarServiceService,
+    private _signupLoginService: SignupLoginService
+  ) {}
   ngOnInit() {
     this.getData();
+    this.getRecommendationList()
+  }
+
+  getRecommendationList()
+  {
+    console.log("into the recommendations list fetching API")
+    this._signupLoginService.fetchRecommendations().subscribe((response) => {
+      response = this._sarService.decrypt(response.edc);
+      if (response.success) {
+      console.log(response,'this is the response in the get recommedations list api call')
+      this.recommendations=response.data
+      }
+      else
+      {
+        //!through toaster message
+        console.log('error while fethcing the recommendations')
+      }
+    });
   }
   
   selectedAction() {
@@ -39,10 +68,47 @@ export class MusicPlayerMainComponent implements OnInit {
     this.songStatus = !this.songStatus;
   }
   
-  PlayerAction(){
+  PlayerAction(e?:any){
+    if(e)
+      {
+        console.log('this is the selected song',e?._id)
+        const body:any={}
+        body['s_id']=e.id
+        this.fetchSelectedSong({s_id:e._id})
+      }
     this.playerType = !this.playerType;
     this.playerOptions = false;
   }
+  fetchSelectedSong(body:any)
+  {
+    console.log(body,'this is the body to fetch the selected song')
+    this._signupLoginService.getSelectedSong(body).subscribe((response:any) => {
+      response = this._sarService.decrypt(response.edc);
+      console.log(response,'this is the response ************')
+      if (response.success) {
+      console.log(response,'this is the response in seletced song api')
+      this.base64String=response.song
+      this.playAudio()
+      }
+      else
+      {
+        //!through toaster message
+        console.log('error while fethcing the selected song')
+      }
+    });
+  }
+  
+  playAudio() {
+    const binaryString = window.atob(this.base64String);
+    const binaryLen = binaryString.length;
+    const bytes = new Uint8Array(binaryLen);
+    for (let i = 0; i < binaryLen; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    const blob = new Blob([bytes], { type: 'audio/mp3' });
+    this.audioUrl = window.URL.createObjectURL(blob);
+  }
+
   
   PlayersOptions(){
     this.playerOptions = !this.playerOptions;

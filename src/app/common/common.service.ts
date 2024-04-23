@@ -65,15 +65,18 @@ export class CommonService {
     method: string;
     body?: any;
   }): Observable<any> {
-    switch (method.toUpperCase()) {
+    switch (method.toUpperCase())
+     {
       case 'LOGIN':
-        console.log(url, {
-          edc: this._sarService.encrypt(JSON.stringify(body)),
-        })
-        return this._http
-          .post(url, {
-            edc: this._sarService.encrypt(JSON.stringify(body)),
-          })
+        console.log(url, {edc: this._sarService.encrypt(JSON.stringify(body))})
+        return this._http.post(url, {edc: this._sarService.encrypt(JSON.stringify(body))})
+      
+      case 'GET':
+      return this._http.get(url)
+
+      case 'POST':
+        console.log(url, {edc: this._sarService.encrypt(JSON.stringify(body))})
+        return this._http.post(url, {edc: this._sarService.encrypt(JSON.stringify(body))})
           .pipe(
             catchError((error) => {
               console.log(error);
@@ -83,6 +86,7 @@ export class CommonService {
           );
         break;
     }
+      
     return new Observable((observer) => observer.error(new Error('false')));
   }
 }

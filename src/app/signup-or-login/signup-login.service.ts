@@ -39,4 +39,15 @@ export class SignupLoginService {
     const url = SignupLoginSettings.API.RESET_PASSWORD;
     return this._commonService.callApi({ url, method: 'LOGIN', body });
   }
+
+  fetchRecommendations()
+  {
+    const url = SignupLoginSettings.API.FETCH_RECOMMENDATIONS;
+    return this._commonService.callApi({ url, method: 'GET' });
+  }
+
+  getSelectedSong(body:any)  {
+    const url = SignupLoginSettings.API.FETCH_SELECTED_SONG;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
 }

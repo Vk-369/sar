@@ -8,7 +8,6 @@
             <img src="../../assets/images/imge.jpg" alt="Profile Pic">
         </div>
     </div>
-
     <div class="main-body-card">
         <div class="welcome-details" *ngIf="!searchType">
             <div class="welcome-details-set">
@@ -53,16 +52,16 @@
 
     <div class="sub-title-text">Recently Played</div>
     <ul class="play-list-set">
-        <ng-container *ngFor="let item of [1,2,3,4,5,2,2,2,3,2,4,2,1,3,4,3,2,2,3,2,3,3]">
+        <ng-container *ngFor="let item of recommendations">
             <li>
-                <div class="play-list-set-item" (click)="PlayerAction()">
+                <div class="play-list-set-item" (click)="PlayerAction(item)">
                     <div class="play-list-left">
                         <div class="play-list-imag">
-                            <img src="../../assets/images/imge.jpg" alt="">
+                            <img [src]=item.s_pic_path alt="">
                         </div>
                         <div class="play-details-set">
-                            <div class="play-name">Chained down</div>
-                            <div class="play-sub-name">Teddy Mill</div>
+                            <div class="play-name">{{item?.s_displayName ? item?.s_displayName :'&mdash;' }}</div>
+                            <div class="play-sub-name">{{item?.s_artist ? item?.s_artist :'&mdash;' }}</div>
                         </div>
                     </div>
                     <div class="play-list-right">
@@ -82,6 +81,14 @@
 
     </ul>
 </div>
+
+<audio controls [src]="audioUrl">
+    Your browser does not support the audio element.
+  </audio>
+
+  
+
+
 
 <div class="palyer-wrapper" [ngClass]="{'active': playerType}">
     <div class="player-card">
