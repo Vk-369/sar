@@ -1,195 +1,173 @@
 <ng-container *ngIf="!userProf">
-<div class="screen-wrapper">
-    <div class="screen-header">
-        <div class="header-list-icon">
-            <i class="fas fa-angle-left fa-lg"  style="color: #000205"></i>
-        </div>
-        <div class="header-profile" (click)="showserProf()">
-            <img src="../../assets/images/imge.jpg" alt="Profile Pic">
-        </div>
-    </div>
-    <div class="main-body-card">
-        <div class="welcome-details" *ngIf="!searchType">
-            <div class="welcome-details-set">
-                <div class="welcome-text">Hello, Chittibabu</div>
-                <div class="welcome-sub-text">What you want to hear today?</div>
+
+    <div class="screen-wrapper">
+        <div class="screen-header">
+            <div class="header-list-icon">
+                <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
             </div>
-            <div class="search-set" (click)="SearchAction()">
-                <i class="fas fa-search"></i>
+            <div class="header-profile" (click)="showserProf()">
+                <img src="../../assets/images/imge.jpg" alt="Profile Pic">
             </div>
         </div>
-        <div style="padding: 17.5px 18px;" *ngIf="searchType">
-            <div class="input-group">
-                <span class="input-group-addon">
+        <div class="main-body-card">
+            <div class="welcome-details" *ngIf="!searchType">
+                <div class="welcome-details-set">
+                    <div class="welcome-text">Hello, Chittibabu</div>
+                    <div class="welcome-sub-text">What you want to hear today?</div>
+                </div>
+                <div class="search-set" (click)="SearchAction()">
                     <i class="fas fa-search"></i>
-                </span>
-                <input type="text" value="" placeholder="Search">
-                <button (click)="SearchAction()">
-                    <i class="fas fa-times"></i>
-                </button>
+                </div>
             </div>
-        </div>
-        <div class="sub-title-text">Albums</div>
+            <div style="padding: 17.5px 18px;" *ngIf="searchType">
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" value="" placeholder="Search">
+                    <button (click)="SearchAction()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="sub-title-text">Albums</div>
 
-        <div class="album-carousel-set">
-            <div class="album-carousel-card" (click)="openModal()">
-                <div class="play-card">
-                    <div class="play-card-details">
-                        <div class="play-card-title">Clouds</div>
-                        <div class="play-card-sub">Playd Bone</div>
-                    </div>
-                    <div class="play-card-icon">
-                        <i class="fas fa-play"></i>
+            <div class="album-carousel-set">
+                <div class="album-carousel-card" (click)="openModal()">
+                    <div class="play-card">
+                        <div class="play-card-details">
+                            <div class="play-card-title">Clouds</div>
+                            <div class="play-card-sub">Playd Bone</div>
+                        </div>
+                        <div class="play-card-icon">
+                            <i class="fas fa-play"></i>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
 
+
+
+
+        <div class="sub-title-text">Recently Played</div>
+        <ul class="play-list-set">
+            <ng-container *ngFor="let item of recommendations">
+                <li>
+                    <div class="play-list-set-item" (click)="PlayerAction(item)">
+                        <div class="play-list-left">
+                            <div class="play-list-imag">
+                                <img [src]=item.s_pic_path alt="">
+                            </div>
+                            <div class="play-details-set">
+                                <div class="play-name">{{item?.s_displayName ? item?.s_displayName :'&mdash;' }}</div>
+                                <div class="play-sub-name">{{item?.s_artist ? item?.s_artist :'&mdash;' }}</div>
+                            </div>
+                        </div>
+                        <div class="play-list-right">
+                            <div class="time-set">4:53</div>
+                            <div class="play-options">
+                                <a class="">
+                                    <i class="far fa-ellipsis-vertical"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <a class="icon-heart" [ngClass]="{'active': selected == true}" (click)="selectedAction()">
+                        <i class="far fa-heart"></i>
+                    </a>
+                </li>
+            </ng-container>
+
+        </ul>
     </div>
 
+    <audio controls [src]="audioUrl">
+        Your browser does not support the audio element.
+    </audio>
 
 
 
-    <div class="sub-title-text">Recently Played</div>
-    <ul class="play-list-set">
-        <ng-container *ngFor="let item of recommendations">
-            <li>
-                <div class="play-list-set-item" (click)="PlayerAction(item)">
-                    <div class="play-list-left">
-                        <div class="play-list-imag">
-                            <img [src]=item.s_pic_path alt="">
-                        </div>
-                        <div class="play-details-set">
-                            <div class="play-name">{{item?.s_displayName ? item?.s_displayName :'&mdash;' }}</div>
-                            <div class="play-sub-name">{{item?.s_artist ? item?.s_artist :'&mdash;' }}</div>
-                        </div>
+
+
+    <div class="palyer-wrapper" [ngClass]="{'active': playerType}">
+        <div class="player-card">
+            <div class="player-card-header">
+                <div class="player-back" (click)="PlayerAction()">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="player-song-details">
+                    <div class="player-title">Playein From Album</div>
+                    <div class="player-album-name">Daddy</div>
+                </div>
+                <div class="player-options" (click)="PlayersOptions()">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            </div>
+            <div class="music-card">
+                <img src="https://images.unsplash.com/photo-1576764402988-7143f9cca90a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
+                    alt="artist Cover" id="cover" />
+                <div class="play-inner-details-set">
+                    <div class="play-details">
+                        <h2 class="music-card-titre">Surat TAHA</h2>
+                        <span class="music-card-artist">Saad Alghamdi</span>
                     </div>
-                    <div class="play-list-right">
-                        <div class="time-set">4:53</div>
-                        <div class="play-options">
-                            <a class="">
-                                <i class="far fa-ellipsis-vertical"></i>
-                            </a>
-                        </div>
+                    <div class="play-like">
+                        <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'" (click)="statusAction()"></span>
                     </div>
                 </div>
-                <a class="icon-heart" [ngClass]="{'active': selected == true}" (click)="selectedAction()">
-                    <i class="far fa-heart"></i>
-                </a>
+                <div class="music-card-controllers">
+                    <input type="range" value="0" id="tracker" />
+                    <span class="music-card-controllers-time" id="current-time">00:00</span>
+                    <span class="music-card-controllers-time" id="info-time">2:44</span>
+                </div>
+                <div class="music-card-actions">
+                    <button id="prev">
+                        <span class="fas fa-random"></span>
+                    </button>
+                    <button id="backward">
+                        <span class="fas fa-step-backward"></span>
+                    </button>
+                    <button class="music-card-actions-main" tabindex="0">
+                        <span class="fas fa-play"></span>
+                    </button>
+                    <button id="forward">
+                        <span class="fas fa-step-forward"></span>
+                    </button>
+                    <button id="next">
+                        <span class="fas fa-retweet"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="play-list-options-card" [ngClass]="{'active': playerOptions}">
+        <div class="play-list-options-card-header">
+            <span class="close" (click)="PlayersOptions()">
+                <!-- <i class="fas fa-times"></i> -->
+            </span>
+        </div>
+        <div class="play-list-options-card-body">
+            <li *ngFor="let item of optionsList; let i = index">
+                <div class="play-list-options">
+                    <i class="far fa-{{item.itemIcon}}"></i>
+                    {{item.itemName}}
+                </div>
             </li>
-        </ng-container>
-
-    </ul>
-</div>
-
-<audio controls [src]="audioUrl">
-    Your browser does not support the audio element.
-  </audio>
-
-  
-
-
-
-<div class="palyer-wrapper" [ngClass]="{'active': playerType}">
-    <div class="player-card">
-        <div class="player-card-header">
-            <div class="player-back" (click)="PlayerAction()">
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="player-song-details">
-                <div class="player-title">Playein From Album</div>
-                <div class="player-album-name">Daddy</div>
-            </div>
-            <div class="player-options" (click)="PlayersOptions()">
-                <i class="fas fa-ellipsis-v"></i>
-            </div>
-        </div>
-        <div class="music-card">
-            <img src="https://images.unsplash.com/photo-1576764402988-7143f9cca90a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                alt="artist Cover" id="cover" />
-            <div class="play-inner-details-set">
-                <div class="play-details">
-                    <h2 class="music-card-titre">Surat TAHA</h2>
-                    <span class="music-card-artist">Saad Alghamdi</span>
-                </div>
-                <div class="play-like">
-                    <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'" (click)="statusAction()"></span>
-                </div>
-            </div>
-            <div class="music-card-controllers">
-                <input type="range" value="0" id="tracker" />
-                <span class="music-card-controllers-time" id="current-time">00:00</span>
-                <span class="music-card-controllers-time" id="info-time">2:44</span>
-            </div>
-            <div class="music-card-actions">
-                <button id="prev">
-                    <span class="fas fa-random"></span>
-                </button>
-                <button id="backward">
-                    <span class="fas fa-step-backward"></span>
-                </button>
-                <button class="music-card-actions-main" tabindex="0">
-                    <span class="fas fa-play"></span>
-                </button>
-                <button id="forward">
-                    <span class="fas fa-step-forward"></span>
-                </button>
-                <button id="next">
-                    <span class="fas fa-retweet"></span>
-                </button>
-            </div>
         </div>
     </div>
-</div>
 
-<div class="play-list-options-card" [ngClass]="{'active': playerOptions}">
-    <div class="play-list-options-card-header">
-        <span class="close" (click)="PlayersOptions()">
-            <!-- <i class="fas fa-times"></i> -->
-        </span>
-    </div>
-    <div class="play-list-options-card-body">
-        <li *ngFor="let item of optionsList; let i = index">
-            <div class="play-list-options">
-                <i class="far fa-{{item.itemIcon}}"></i>
-                {{item.itemName}}
+    <div class="modal-wrap" [ngClass]="{'active': modalActive}">
+        <div class="modal-set">
+            <div class="modal-header">
+                <div class="modal-title">+Add Playlist</div>
+                <div class="modal-close" (click)="openModal()">X</div>
             </div>
-        </li>
-    </div>
-</div>
-
-<div class="modal-wrap" [ngClass]="{'active': modalActive}">
-    <div class="modal-set">
-        <div class="modal-header">
-            <div class="modal-title">+Add Playlist</div>
-            <div class="modal-close" (click)="openModal()">X</div>
-        </div>
-        <div class="modal-body">
-            <ul class="modal-play-list-set">
-                <li>
-                    <div class="play-card">
-                        <div class="play-card-details">
-                            <div class="play-card-title">Clouds</div>
-                            <div class="play-card-sub">Playd Bone</div>
-                        </div>
-                        <div class="play-card-icon">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="play-card">
-                        <div class="play-card-details">
-                            <div class="play-card-title">Clouds</div>
-                            <div class="play-card-sub">Playd Bone</div>
-                        </div>
-                        <div class="play-card-icon">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="album-carousel-card" (click)="openModal()">
+            <div class="modal-body">
+                <ul class="modal-play-list-set">
+                    <li>
                         <div class="play-card">
                             <div class="play-card-details">
                                 <div class="play-card-title">Clouds</div>
@@ -199,14 +177,43 @@
                                 <i class="fas fa-play"></i>
                             </div>
                         </div>
-                    </div>
-                </li>
-            </ul>
+                    </li>
+                    <li>
+                        <div class="play-card">
+                            <div class="play-card-details">
+                                <div class="play-card-title">Clouds</div>
+                                <div class="play-card-sub">Playd Bone</div>
+                            </div>
+                            <div class="play-card-icon">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="album-carousel-card" (click)="openModal()">
+                            <div class="play-card">
+                                <div class="play-card-details">
+                                    <div class="play-card-title">Clouds</div>
+                                    <div class="play-card-sub">Playd Bone</div>
+                                </div>
+                                <div class="play-card-icon">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 </ng-container>
 <ng-container *ngIf="userProf">
-<app-emp-pro (closeEmpView)="closeView($event)"></app-emp-pro>
+    <app-emp-pro (closeEmpView)="closeView($event)"></app-emp-pro>
 </ng-container>
 
+
+
+
+<!-- <ng-container>
+    <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
+</ng-container> -->

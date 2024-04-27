@@ -12,3 +12,4 @@ export class SignupLoginSettings {
     FETCH_SELECTED_SONG:env.apiUrl + `/get/selected/music/file`,
   };
 }
+

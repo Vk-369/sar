@@ -4,100 +4,110 @@ import 'owl.carousel'; // Import Owl Carousel library
 import * as $ from 'jquery';
 import { SignupLoginService } from '../signup-or-login/signup-login.service';
 import { SarServiceService } from '../sar-service.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 // Extend the JQuery interface to include the owlCarousel method
 
 @Component({
   selector: 'app-music-player-main',
   templateUrl: './music-player-main.component.html',
-  styleUrls: ['./music-player-main.component.css']
+  styleUrls: ['./music-player-main.component.css'],
 })
 export class MusicPlayerMainComponent implements OnInit {
-  songStatus:any = false;
-  playerType:any = false;
-  playerOptions:any = false;
+  songStatus: any = false;
+  playerType: any = false;
+  playerOptions: any = false;
   selected: any = false;
   modalActive: any = false;
   searchType: any = false;
   optionsList: any = [];
-  userProf:boolean=false
-  recommendations:any=[]
-  base64String: any=String
-  audioUrl:any= String;
+  userProf: boolean = false;
+  recommendations: any = [];
+  base64String: any = String;
+  audioUrl: any = String;
+  safeUrl: any;
+  openVideo: any = false;
 
-  
   constructor(
     private _sarService: SarServiceService,
-    private _signupLoginService: SignupLoginService
+    private _signupLoginService: SignupLoginService,
+    private sanitizer: DomSanitizer
   ) {}
   ngOnInit() {
     this.getData();
-    this.getRecommendationList()
+    this.getRecommendationList();
   }
 
-  getRecommendationList()
-  {
-    console.log("into the recommendations list fetching API")
+  getRecommendationList() {
+    console.log('into the recommendations list fetching API');
     this._signupLoginService.fetchRecommendations().subscribe((response) => {
       response = this._sarService.decrypt(response.edc);
       if (response.success) {
-      console.log(response,'this is the response in the get recommedations list api call')
-      this.recommendations=response.data
-      }
-      else
-      {
+        console.log(
+          response,
+          'this is the response in the get recommedations list api call'
+        );
+        this.recommendations = response.data;
+      } else {
         //!through toaster message
-        console.log('error while fethcing the recommendations')
+        console.log('error while fethcing the recommendations');
       }
     });
   }
-  
+
   selectedAction() {
     this.selected = !this.selected;
   }
-  
 
-  openModal(){
+  openModal() {
     this.modalActive = !this.modalActive;
   }
-  SearchAction(){
+  SearchAction() {
     this.searchType = !this.searchType;
   }
 
-  statusAction(){
+  statusAction() {
     this.songStatus = !this.songStatus;
   }
-  
-  PlayerAction(e?:any){
-    if(e)
-      {
-        console.log('this is the selected song',e?._id)
-        const body:any={}
-        body['s_id']=e.id
-        this.fetchSelectedSong({s_id:e._id})
-      }
+
+  PlayerAction(e?: any) {
+    if (e) {
+      console.log('this is the selected song', e?._id);
+      const body: any = {};
+      body['s_id'] = e.id;
+      this.fetchSelectedSong({ s_id: e._id });
+    }
     this.playerType = !this.playerType;
     this.playerOptions = false;
   }
-  fetchSelectedSong(body:any)
-  {
-    console.log(body,'this is the body to fetch the selected song')
-    this._signupLoginService.getSelectedSong(body).subscribe((response:any) => {
-      response = this._sarService.decrypt(response.edc);
-      console.log(response,'this is the response ************')
-      if (response.success) {
-      console.log(response,'this is the response in seletced song api')
-      this.base64String=response.song
-      this.playAudio()
-      }
-      else
-      {
-        //!through toaster message
-        console.log('error while fethcing the selected song')
-      }
-    });
+  videoId: any;
+  fetchSelectedSong(body: any) {
+    console.log(body, 'this is the body to fetch the selected song');
+    this._signupLoginService
+      .getSelectedSong(body)
+      .subscribe((response: any) => {
+        response = this._sarService.decrypt(response.edc);
+        console.log(response, 'this is the response ************');
+        if (response.success) {
+          console.log(response, 'this is the response in seletced song api');
+          this.base64String = response.song;
+          this.videoId = response.videoId;
+          this.playAudio();
+        } else {
+          //!through toaster message
+          console.log('error while fethcing the selected song');
+        }
+      });
   }
-  
+
+  playVideo() {
+    this.openVideo = true;
+    const videoId = this.videoId; // Replace with your video ID
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://www.youtube.com/embed/${videoId}`
+    );
+  }
+
   playAudio() {
     const binaryString = window.atob(this.base64String);
     const binaryLen = binaryString.length;
@@ -109,47 +119,42 @@ export class MusicPlayerMainComponent implements OnInit {
     this.audioUrl = window.URL.createObjectURL(blob);
   }
 
-  
-  PlayersOptions(){
+  PlayersOptions() {
     this.playerOptions = !this.playerOptions;
   }
 
-  getData(){
+  getData() {
     this.optionsList = [
       {
         itemName: 'Like',
-        itemIcon: 'heart'
+        itemIcon: 'heart',
       },
       {
         itemName: 'Hide this song',
-        itemIcon: 'heart'
+        itemIcon: 'heart',
       },
       {
         itemName: 'Add to playlist',
-        itemIcon: 'heart'
+        itemIcon: 'heart',
       },
       {
         itemName: 'Connect friend',
-        itemIcon: 'users'
+        itemIcon: 'users',
       },
       {
         itemName: 'Play Video',
-        itemIcon: 'users'
+        itemIcon: 'users',
       },
       {
         itemName: 'lyrics',
-        itemIcon: 'users'
-      }
+        itemIcon: 'users',
+      },
     ];
   }
-  showserProf()
-  {
-  this.userProf=true
+  showserProf() {
+    this.userProf = true;
   }
-  closeView(e:any)
-  {
-    if(e)
-  this.userProf=false
-
+  closeView(e: any) {
+    if (e) this.userProf = false;
   }
 }
