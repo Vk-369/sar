@@ -115,6 +115,8 @@ export class MusicPlayerMainComponent implements OnInit {
       } else {
         //!through toaster message
     this.songsListShimmer=false
+    this.toastr.error('error while fetching recommendations');
+
 
         console.log('error while fethcing the recommendations');
       }
@@ -183,7 +185,6 @@ export class MusicPlayerMainComponent implements OnInit {
 
       } else {
         //!through toaster message
-        console.log('error while insertion');
         this.toastr.warning(response.message);
         this.closeModal()
         this.checkedIndex=-1
@@ -339,6 +340,8 @@ selectedSong:any
           } else {
             //!through toaster message
             console.log('error while fethcing the recommendations');
+        this.toastr.error('error while fethcing the recommendations');
+
           }
         });
 
@@ -356,7 +359,7 @@ selectedSong:any
         );
       } else {
         //!through toaster message
-        console.log('error while fethcing the recommendations');
+        this.toastr.error('error while fetching playlists');
       }
     });
 
@@ -378,8 +381,7 @@ selectedSong:any
       } else {
         //!through toaster message
        this.songsListShimmer=false
-
-        console.log('error while fethcin  g the recommendations');
+       this.toastr.error('error while fetching songs of playlist');
       }
     });
   }
