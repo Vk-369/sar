@@ -1,17 +1,18 @@
 <ng-container *ngIf="!userProf">
-
     <div class="screen-wrapper">
         <div class="screen-header">
             <div class="header-list-icon">
                 <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
             </div>
             <div class="header-profile" (click)="showserProf()">
-                <img src="../../assets/images/imge.jpg" alt="Profile Pic">
+                <img src="../../assets/images/profile/9Nq36hXx4y.png" alt="Profile Pic">
             </div>
         </div>
         <div class="main-body-card">
             <div class="welcome-details" *ngIf="!searchType">
                 <div class="welcome-details-set">
+                    <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>
+                    <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>
                     <div class="welcome-text">Hello, Chittibabu</div>
                     <div class="welcome-sub-text">What you want to hear today?</div>
                 </div>
@@ -27,13 +28,13 @@
                     <input type="text" value="" placeholder="Search">
                     <button (click)="SearchAction()">
                         <i class="fas fa-times"></i>
-                    </button>
+                    </button> 
                 </div>
             </div>
             <div class="sub-title-text">Albums</div>
 
             <div class="album-carousel-set">
-                <div class="album-carousel-card" (click)="openModal()">
+         <div class="album-carousel-card"  [style.background-image]="'url(' +   + ')'" (click)="openModal()">
                     <div class="play-card">
                         <div class="play-card-details">
                             <div class="play-card-title">Clouds</div>
@@ -47,26 +48,25 @@
             </div>
 
         </div>
-
-
+        <!-- <div class="time-set">{{item.duration | SecondsToMinutesPipe}}</div> -->
 
 
         <div class="sub-title-text">Recently Played</div>
-        <ul class="play-list-set">
-            <ng-container *ngFor="let item of recommendations">
+        <ul  *ngIf="!songsListShimmer" class="play-list-set">
+            <ng-container *ngFor="let item of recommendations let i=index">
                 <li>
-                    <div class="play-list-set-item" (click)="PlayerAction(item)">
+                    <div class="play-list-set-item" (click)="PlayerAction(item,i);play=true">
                         <div class="play-list-left">
                             <div class="play-list-imag">
                                 <img [src]=item.s_pic_path alt="">
                             </div>
                             <div class="play-details-set">
                                 <div class="play-name">{{item?.s_displayName ? item?.s_displayName :'&mdash;' }}</div>
-                                <div class="play-sub-name">{{item?.s_artist ? item?.s_artist :'&mdash;' }}</div>
+                                <div class="play-sub-name">{{item?.artist ? item?.artist :'&mdash;' }}</div>
                             </div>
                         </div>
                         <div class="play-list-right">
-                            <div class="time-set">4:53</div>
+                            <div class="time-set">{{item.duration}}</div>
                             <div class="play-options">
                                 <a class="">
                                     <i class="far fa-ellipsis-vertical"></i>
@@ -74,31 +74,31 @@
                             </div>
                         </div>
                     </div>
-                    <a class="icon-heart" [ngClass]="{'active': selected == true}" (click)="selectedAction()">
+                    <!-- <a class="icon-heart" [ngClass]="{'active': selected == true}" (click)="selectedAction()">
                         <i class="far fa-heart"></i>
-                    </a>
+                    </a> -->
                 </li>
             </ng-container>
-
         </ul>
+        <ng-container *ngIf="songsListShimmer">
+            <div *ngFor="let item of [1,2,3,4,5,6]" class="shimmer" ></div>
+        </ng-container>
     </div>
 
-    <audio controls [src]="audioUrl">
-        Your browser does not support the audio element.
-    </audio>
 
 
 
 
+    <!-- uncomment this -->
 
     <div class="palyer-wrapper" [ngClass]="{'active': playerType}">
         <div class="player-card">
             <div class="player-card-header">
-                <div class="player-back" (click)="PlayerAction()">
-                    <i class="fas fa-chevron-down"></i>
+                <div class="player-back">
+                    <i class="fas fa-chevron-down" (click)="playerType=false"></i>
                 </div>
                 <div class="player-song-details">
-                    <div class="player-title">Playein From Album</div>
+                    <div class="player-title">Playing From Album</div>
                     <div class="player-album-name">Daddy</div>
                 </div>
                 <div class="player-options" (click)="PlayersOptions()">
@@ -106,34 +106,48 @@
                 </div>
             </div>
             <div class="music-card">
-                <img src="https://images.unsplash.com/photo-1576764402988-7143f9cca90a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80"
-                    alt="artist Cover" id="cover" />
-                <div class="play-inner-details-set">
-                    <div class="play-details">
-                        <h2 class="music-card-titre">Surat TAHA</h2>
-                        <span class="music-card-artist">Saad Alghamdi</span>
-                    </div>
-                    <div class="play-like">
-                        <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'" (click)="statusAction()"></span>
+                <div class="music-details">
+                        <img  [hidden]="!picLoaded" (load)="songPicLoaded()" [src]="songPic" alt="artist Cover" id="cover" />
+                        <div  [hidden]="picLoaded" class="loader-div">
+                            <div class="loader"></div>
+                        </div>
+                    <div class="play-inner-details-set">
+                        <div class="play-details">
+                            <h2 class="music-card-titre">{{songName}}</h2>
+
+                            <!-- <span class="music-card-artist">{{artistName}}</span> -->
+                        </div>
+                        <!-- <div class="play-like">
+                            <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'"(click)="statusAction()"></span>
+                        </div> -->
                     </div>
                 </div>
                 <div class="music-card-controllers">
-                    <input type="range" value="0" id="tracker" />
-                    <span class="music-card-controllers-time" id="current-time">00:00</span>
-                    <span class="music-card-controllers-time" id="info-time">2:44</span>
+                    <!-- <input type="range" value="0" id="tracker" /> -->
+                    <div class="music-tag">
+                        <audio #audioPlayer controls [src]="audioUrl"
+                            controlsList="nodownload noplaybackrate">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <div class="music-card-time-set">
+                        <span class="music-card-controllers-time" id="current-time">{{currentTime}}</span>
+                        <span class="music-card-controllers-time" id="info-time">{{totalTime}}</span>
+                    </div>
                 </div>
                 <div class="music-card-actions">
                     <button id="prev">
-                        <span class="fas fa-random"></span>
+                        <span class="fas fa-random" (click)="getRecommendationList({shuffle:true})"></span>
                     </button>
-                    <button id="backward">
+                    <button id="backward" (click)="playPrevious()">
                         <span class="fas fa-step-backward"></span>
                     </button>
                     <button class="music-card-actions-main" tabindex="0">
-                        <span class="fas fa-play"></span>
+                        <span *ngIf="play" class="fas fa-play" (click)="playAudio(1)"></span>
+                        <span *ngIf="!play" class="fas fa-pause" (click)="playAudio(0)"></span>
                     </button>
                     <button id="forward">
-                        <span class="fas fa-step-forward"></span>
+                        <span class="fas fa-step-forward" (click)="playNext()"></span>
                     </button>
                     <button id="next">
                         <span class="fas fa-retweet"></span>
@@ -143,6 +157,9 @@
         </div>
     </div>
 
+
+
+
     <div class="play-list-options-card" [ngClass]="{'active': playerOptions}">
         <div class="play-list-options-card-header">
             <span class="close" (click)="PlayersOptions()">
@@ -151,8 +168,8 @@
         </div>
         <div class="play-list-options-card-body">
             <li *ngFor="let item of optionsList; let i = index">
-                <div class="play-list-options">
-                    <i class="far fa-{{item.itemIcon}}"></i>
+                <div class="play-list-options" (click)="optionSelected(item)">
+                    <i class="fas fa-{{item.itemIcon}}"></i>
                     {{item.itemName}}
                 </div>
             </li>
@@ -162,46 +179,32 @@
     <div class="modal-wrap" [ngClass]="{'active': modalActive}">
         <div class="modal-set">
             <div class="modal-header">
-                <div class="modal-title">+Add Playlist</div>
-                <div class="modal-close" (click)="openModal()">X</div>
+                <div class="modal-title" *ngIf="!addingToPlayListCheck" data-target="#exampleModalCenter" data-toggle='modal' (click)="addPlaylist()">+Add Playlist</div>
+                <div class="modal-close" (click)="closeModal();addingToPlayListCheck=false">
+                    <i class="fas fa-times"></i></div>
             </div>
             <div class="modal-body">
                 <ul class="modal-play-list-set">
-                    <li>
-                        <div class="play-card">
-                            <div class="play-card-details">
-                                <div class="play-card-title">Clouds</div>
-                                <div class="play-card-sub">Playd Bone</div>
+
+                    <li class="modal-play-list-item" *ngFor="let item of playLists;let i=index">
+                            <div class="album-carousel-card"  [style.background-image]="'url(' + item.s_pic_path + ')'" (click)="functionCall(item,i)" >
+                            <div>
+                                <!-- <i class="fa-regular fas fa-circle"></i> -->
+                                <i *ngIf="addingToPlayListCheck&&checkedIndex!=i" class="fa-light fas fa-circle" style="color: white;"></i>
+                                <i *ngIf="addingToPlayListCheck&&checkedIndex==i" class="fas fa-check-circle" style="color: white;"></i>
                             </div>
-                            <div class="play-card-icon">
-                                <i class="fas fa-play"></i>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="play-card">
-                            <div class="play-card-details">
-                                <div class="play-card-title">Clouds</div>
-                                <div class="play-card-sub">Playd Bone</div>
-                            </div>
-                            <div class="play-card-icon">
-                                <i class="fas fa-play"></i>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="album-carousel-card" (click)="openModal()">
-                            <div class="play-card">
-                                <div class="play-card-details">
-                                    <div class="play-card-title">Clouds</div>
-                                    <div class="play-card-sub">Playd Bone</div>
+                            <div class="play-card" >
+                                <div class="play-card-details" >
+                                    <div class="play-card-title">{{item.playListName}}</div>
+                                    <!-- <div class="play-card-sub">Playd Bone</div> -->
                                 </div>
-                                <div class="play-card-icon">
+                                <!-- <div class="play-card-icon">
                                     <i class="fas fa-play"></i>
-                                </div>
+                                </div> -->
                             </div>
                         </div>
                     </li>
+                    
                 </ul>
             </div>
         </div>
@@ -212,8 +215,11 @@
 </ng-container>
 
 
+<!-- modal for adding a playlist -->
+<app-modal *ngIf="addPlayListVariable"  (confirmModal)="createPlaylist($event)"
+[inputNeeded]="true" modalTitle='Add Playlist'  [showClose]="false" confirmContent="+Add"></app-modal>
+<!-- (confirmModal)="fromModal($event)" -->
 
-
-<!-- <ng-container>
+<ng-container *ngIf="openVideo">
     <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
-</ng-container> -->
+</ng-container>

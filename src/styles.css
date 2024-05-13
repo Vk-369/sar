@@ -350,7 +350,7 @@ html, body {
 
     }
     .album-carousel-card{
-        background-image: url("https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
+        /*  background-image: url("https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"); */
         background-color: #cccccc;
         /* background-size: 2000px; */
         background-position-x: center;
@@ -465,13 +465,16 @@ html, body {
         padding: 0;
         overflow-y: auto;
         max-height: 396px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 12px;
     }
-    .modal-play-list-set li{
+    /* .modal-play-list-set li{
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 10px;
-    }
+    } */
     .modal-play-list-set li .play-card{
         width: 100%;
     }
@@ -527,8 +530,94 @@ html, body {
         align-items: center;
         flex-direction: column;
         transition: 0.3s all ease-in-out;
+        height: calc(100% - 42px);
+        justify-content: space-between;
         /* padding: 16px 13px; */
     }
+    .music-card .music-tag{
+        transform: scale(1.4);
+        height: 30px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .music-card .music-tag audio{
+        width: calc(100% - 74px);
+    }
+
+/* this is my space    900000000000000000000000000000000000000000000000000000000 */
+
+    /* .music-card .music-tag audio::-webkit-media-controls-mute-button{
+        display: none !important;
+    }
+    .music-card .music-tag audio::-webkit-media-controls-volume-slider{
+        display: none !important;
+    } */
+   
+/* working one    please dont delet this*/
+    audio::-webkit-media-controls-volume-slider {
+        display: none;
+      }
+    
+      audio::-webkit-media-controls-volume-control-container {
+        display: none;
+      }
+    audio::-webkit-media-controls-mute-button { display: none !important; }
+    
+/* for play button */
+      
+      audio::-webkit-media-controls-play-button {
+        background-color: #B1D4E0;
+        border-radius: 50%;
+      }
+/* for play button */
+/* for current time  start*/
+      
+      audio::-webkit-media-controls-current-time-display {
+        color: blue;
+  display: none !important;
+
+      }
+      
+/* for current time  end*/
+/* for remaining time start */
+  
+  audio::-webkit-media-controls-time-remaining-display {
+    color: red;
+  display: none !important;
+
+  }
+/* for remaining time end */
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-pause-button {
+  display: none !important;
+}
+  
+  
+  
+    
+      
+
+/* working one  please dont delet this above*/ 
+
+
+
+/* this is my space    900000000000000000000000000000000000000000000000000000000 */
+/* Custom CSS */
+.bottom-line {
+    border: none;
+    border-bottom: 2px solid #ced4da; /* Bottom line color */
+    border-radius: 0; /* Remove border radius if needed */
+    padding: 0; /* Remove default padding if needed */
+    background-color: transparent; /* Transparent background */
+  }
+  
+  /* Optional: Change bottom line color on focus */
+  /* .bottom-line:focus {
+    border-color: #80bdff; 
+  }
+   */
+
     .music-card img {
         height: 280px;
         width: 280px;
@@ -555,11 +644,17 @@ html, body {
         font-size: 14px;
     }
     .music-card-controllers {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .music-card-time-set{
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        width: 100%;
+        width: calc(100% - 40px);
         margin-top: 16px;
     }
     .music-card-controllers input[type=range] {
@@ -599,6 +694,7 @@ html, body {
     }
     .music-card-actions {
         margin-top: 10px;
+        margin-bottom:106px;
         display: flex;
         width: 100%;
         align-items: center;
@@ -737,7 +833,7 @@ html, body {
     }
     .profile-page:before{
         content: '';
-        background: #db1e00;
+        background: #a88eec;
         height: 250px;
         position: absolute;
         left: 0;
@@ -745,7 +841,8 @@ html, body {
         top: 0;
     }
     .profile-page .profile-page-header{
-        background: #f72a0a;
+        background: #c8b6f5;
+
         text-align: center;
         position: relative;
         height: 40px;
@@ -790,12 +887,43 @@ html, body {
         overflow: hidden;
         margin: auto;
         margin-bottom: 20px;
+        position: relative;
     }
     .profile-page .profile-page-body .profile-img-set img{
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
+
+    .profile-page .profile-page-body .profile-img-set .profile-edit{
+        position: absolute;
+        height: 30px;
+        width: 30px;
+        bottom: 10px;
+        right: 5px;
+        z-index: 11;
+        display: block;
+        border-radius: 50%;
+        background: black;
+        color: white;
+        line-height: 30px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    
+    .profile-page .profile-page-body .profile-img-set .profile-edit label{
+        margin: 0px;
+        display: inline-block;
+    }
+    
+    .profile-page .profile-page-body .profile-img-set .profile-edit input{
+        visibility: visible;
+        height: 0px;
+        width: 0px;
+        opacity: 0;
+    }
+
 
     .profile-card{
         background: #fff;
@@ -846,6 +974,76 @@ html, body {
   }
 }
 
+audio::-webkit-media-controls-panel {
+    background-color: white;
+}
+
+.loader-div{
+    height: 280px;
+    width: 280px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+}
+
+.loader, .loader:before, .loader:after {
+    border-radius: 50%;
+    width: 2.5em;
+    height: 2.5em;
+    animation-fill-mode: both;
+    animation: bblFadInOut 1.8s infinite ease-in-out;
+  }
+  .loader {
+    color: #7067C2;
+    font-size: 7px;
+    position: relative;
+    text-indent: -9999em;
+    transform: translateZ(0);
+    animation-delay: -0.16s;
+  }
+  .loader:before,
+  .loader:after {
+    content: '';
+    position: absolute;
+    top: 0;
+  }
+  .loader:before {
+    left: -3.5em;
+    animation-delay: -0.32s;
+  }
+  .loader:after {
+    left: 3.5em;
+  }
+  
+  @keyframes bblFadInOut {
+    0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+    40% { box-shadow: 0 2.5em 0 0 }
+  }
+      
+
+  .shimmer {
+  background: #f6f6f6;
+  background-image: linear-gradient(to right, #f6f6f6 0%, #e6e6e6 20%, #f6f6f6 40%, #e6e6e6 60%, #f6f6f6 80%, #e6e6e6 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
+  width:100%;
+  height: 40px; 
+  border-radius: 10px;
+  width: calc(100% - 30px);
+  margin: auto;
+  margin-bottom: 15px;
+}
+
+@import 'ngx-toastr/toastr';
+  
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: 200px 0;
+  }
+}
 
 
 

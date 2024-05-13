@@ -10,14 +10,19 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
+      <div *ngIf="!inputNeeded" class="modal-body">
         {{modalBody}}
       </div>
+      <div *ngIf="inputNeeded" [formGroup]="inputFieldForm">
+      <input class="form-control" formControlName="inputData">
+    </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeEvent()"
-          *ngIf="showClose">Close</button>
+          >Close</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent()"
-          *ngIf="showConfirmButton">{{confirmContent}}</button>
+          *ngIf="showConfirmButton && !inputNeeded">{{confirmContent}}</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent('withInput')"
+          *ngIf="showConfirmButton && inputNeeded">{{confirmContent}}</button>
       </div>
     </div>
   </div>

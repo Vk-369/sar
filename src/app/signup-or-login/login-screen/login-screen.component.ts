@@ -165,7 +165,9 @@ export class LoginScreenComponent {
       console.log(response);
       if (response.success) {
         if (response.login === 'success') {
+          console.log(response,'this is the authentication response')
           sessionStorage.setItem('token', response.token);
+          sessionStorage.setItem('userID', response.userID);
           this._router.navigate(['/musicPlayer']);
         } else if (response.login === 'verify') {
           this.verify = true;

@@ -40,14 +40,38 @@ export class SignupLoginService {
     return this._commonService.callApi({ url, method: 'LOGIN', body });
   }
 
-  fetchRecommendations()
+  fetchRecommendations(body:any)
   {
     const url = SignupLoginSettings.API.FETCH_RECOMMENDATIONS;
-    return this._commonService.callApi({ url, method: 'GET' });
+    return this._commonService.callApi({ url, method: 'POST',body });
   }
 
   getSelectedSong(body:any)  {
     const url = SignupLoginSettings.API.FETCH_SELECTED_SONG;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  userDetails(body:any)  {
+    const url = SignupLoginSettings.API.FETCH_USER_DETAILS;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  updateProfile(body:any)  {
+    const url = SignupLoginSettings.API.UPDATE_PROFILE;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  createPlayList(body:any)  {
+    const url = SignupLoginSettings.API.CREATE_PLAYLIST;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  fetchPlayLists(body:any)  {
+    const url = SignupLoginSettings.API.FETCH_PLAYLISTS;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  fetchPlayListLinkedSongs(body:any)  {
+    const url = SignupLoginSettings.API.FETCH_SONGS_LINKED_TO_PLAYLIST;
+    return this._commonService.callApi({ url, method: 'POST',body });
+  }
+  insertSongIntoPlayList(body:any)  {
+    const url = SignupLoginSettings.API.INSERT_SONG_INTO_PLAYLIST;
     return this._commonService.callApi({ url, method: 'POST',body });
   }
 }

@@ -15,6 +15,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { OtpComponent } from './signup-or-login/otp/otp.component';
 import { SignupLoginService } from './signup-or-login/signup-login.service';
 import { HttpClientModule } from '@angular/common/http';
+import { SecondsToMinutesPipe } from './sec-min-pipe';
+import { ToastrModule } from 'ngx-toastr'; // Import ToastrModule
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -28,9 +32,13 @@ import { HttpClientModule } from '@angular/common/http';
     ModalComponent,
     LoginScreenComponent,
     OtpComponent,
+    SecondsToMinutesPipe
+
+
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, HttpClientModule,ToastrModule.forRoot(),BrowserAnimationsModule],
   providers: [SignupLoginService],
   bootstrap: [AppComponent],
+  exports:[SecondsToMinutesPipe]
 })
 export class AppModule {}

@@ -5,33 +5,72 @@
     </div>
     <div class="profile-page-body">
         <div class="profile-img-set">
-            <img src="../../assets/images/imge.jpg" alt="">
+            <img src="../../assets/images/profile/9Nq36hXx4y.png" alt="profile">
+            <div *ngIf="update" class="profile-edit">
+                <label for="myfile" class="edit-label">
+                    <i class="far fa-edit"></i>
+                    <input type="file" id="myfile" name="myfile" (change)="onFileSelected($event)">
+                </label>
+            </div>
         </div>
-        <div class="profile-card">
+
+        <div *ngIf='!update' class="profile-card">
             <div class="data-item-set">
-                <div class="data-value">Salman Saif</div>
+                <div class="data-value">{{userDetails?.username ? userDetails?.username : '-'}}</div>
                 <div class="data-title">Name</div>
             </div>
             <div class="data-item-set">
-                <div class="data-value">saif@gmail.com</div>
-                <div class="data-title">Email</div>
+                <div class="data-value">{{userDetails?.gender ? (userDetails?.gender=='men'? 'Male':'Female') : '-'}}</div>
+                <div class="data-title">Gender</div>
+            </div>
+
+            <div class="data-item-set">
+                <div class="data-value">{{userDetails?.mail_id ? userDetails?.mail_id : '-'}}</div>
+                <div class="data-title">Email ID</div>
             </div>
             <div class="data-item-set">
-                <div class="data-value">Venkat.t@123</div>
-                <div class="data-title">User Name</div>
-            </div>
-            <div class="data-item-set">
-                <div class="data-value">9553338453</div>
+                <div class="data-value">{{userDetails?.phone_no ? userDetails?.phone_no : '-'}}</div>
                 <div class="data-title">Contact</div>
             </div>
             <div class="data-item-set">
-                <div class="data-value">Visakhapatnam</div>
-                <div class="data-title">Address</div>
+                <div class="data-value">{{userDetails?.status ? 'Active' : 'Inactive'}}</div>
+                <div class="data-title">Status</div>
+            </div>
+        </div>
+
+
+
+        <div *ngIf='update' class="profile-card" [formGroup]="updateForm">
+            <div class="data-item-set">
+                <input class="data-value" class='form-control bottom-line'  formControlName="username"     placeholder="User Name">
+                <div class="data-title">Name</div>
+            </div>
+         
+            <div class="data-item-set">
+                <input class='form-control bottom-line' formControlName="email"   placeholder="Mail Id">
+                <div class="data-title">Email ID</div>
+            </div>
+            <div class="data-item-set">
+                <input class='form-control bottom-line' formControlName="contact"   placeholder="PhoneNo">
+                <div class="data-title">Contact</div>
+            </div>
+            <div class="data-item-set">
+                <input type="radio" id="html" name="fav_language" value=1 formControlName="gender">
+                <label for="html">Male</label>
+                <input type="radio" id="html" name="fav_language" value="women" formControlName="gender"   >
+                <label for="html">Female</label>
+                <div class="data-title">Gender</div>
             </div>
         </div>
     </div>
+<app-modal *ngIf="openConfirmationModal" (confirmModal)="fromModal($event)"></app-modal>
+
     <div class="profile-page-footer">
-        <a class="actiion-btn">Edit</a>
+        <a class="actiion-btn"  *ngIf="update" data-target="#exampleModalCenter" data-toggle='modal' (click)="update=true;openModal()">Save</a>
+        <a class="actiion-btn" *ngIf="!update" (click)="update=true">Edit</a>
         <a class="actiion-btn">Logout</a>
     </div>
 </div>
+
+
+
