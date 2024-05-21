@@ -1,5 +1,6 @@
-<div class="back-icon" (click)="back()">
-    <img src="assets/images/login/back.png" alt="login image backgroung">
+<div  (click)="back()">
+    <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
+
 </div>
 <div class="main">
     <div class="main-card" *ngIf="!resetMode">
@@ -121,8 +122,11 @@
         </form>
     </div>
 
-    <div class="sign-up-logo">
-        <img src="assets/images/login/login details.svg" alt="Sign up Image Background">
+  <div>
+        <img  [hidden]="!picLoaded" (load)="songPicLoaded()" src="assets/images/login/login details.svg" alt="Sign up Image Background" id="cover">
+        <div  [hidden]="picLoaded" class="loader-div">
+            <div class="loader"></div>
+        </div>
     </div>
     <div *ngIf="!resetMode">
         <button class="btn-continue" *ngIf="isResetClicked" (click)="sendOtp()">Reset password</button>

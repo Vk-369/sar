@@ -10,8 +10,14 @@
     <div class="login-desc">
          Get ready to immerse yourself in a world of rhythm and harmony.    </div>
     <div class="logon-img-wrapper">
-        <img src="assets/images/login/ListenMusic.svg" alt="login image backgroung">
+
+        <img  [hidden]="!picLoaded" (load)="songPicLoaded()" src="assets/images/login/ListenMusic.svg" alt="login image backgroung" id="cover" />
+        <div  [hidden]="picLoaded" class="loader-div">
+            <div class="loader"></div>
+            please wait while making things for you!
+        </div>
     </div>
+
 
     <button class="custom-btn login-btn" (click)="signUpPage()">Get Started</button>
     <div class="login-account">

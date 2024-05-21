@@ -48,7 +48,12 @@ html, body {
     .content-header {
         display: flex;
         align-items: center;
-        height: 80px;
+        justify-content: space-between;
+        padding: 16px 10px;
+    }
+    .content-header .content-header-left {
+        display: flex;
+        align-items: center;
     }
 
     .content-icon {
@@ -545,16 +550,7 @@ html, body {
         width: calc(100% - 74px);
     }
 
-/* this is my space    900000000000000000000000000000000000000000000000000000000 */
 
-    /* .music-card .music-tag audio::-webkit-media-controls-mute-button{
-        display: none !important;
-    }
-    .music-card .music-tag audio::-webkit-media-controls-volume-slider{
-        display: none !important;
-    } */
-   
-/* working one    please dont delet this*/
     audio::-webkit-media-controls-volume-slider {
         display: none;
       }
@@ -834,7 +830,7 @@ audio::-webkit-media-controls-pause-button {
     .profile-page:before{
         content: '';
         background: #a88eec;
-        height: 250px;
+        height: 350px;
         position: absolute;
         left: 0;
         right: 0;
@@ -881,8 +877,8 @@ audio::-webkit-media-controls-pause-button {
         box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
     }
     .profile-page .profile-page-body .profile-img-set{
-        width: 100px;
-        height: 100px;
+        width: 200px;
+        height: 200px;
         border-radius: 50%;
         overflow: hidden;
         margin: auto;
@@ -895,29 +891,26 @@ audio::-webkit-media-controls-pause-button {
         object-fit: cover;
     }
 
-    .profile-page .profile-page-body .profile-img-set .profile-edit{
+    .profile-page .profile-page-body .profile-edit{
         position: absolute;
-        height: 30px;
-        width: 30px;
-        bottom: 10px;
-        right: 5px;
-        z-index: 11;
-        display: block;
+        top: 30%;
+        right: 25%;
+        z-index: 1;
+        background: #fff;
         border-radius: 50%;
-        background: black;
-        color: white;
+        width: 30px;
+        height: 30px;
         line-height: 30px;
         text-align: center;
-        font-size: 12px;
     }
 
     
-    .profile-page .profile-page-body .profile-img-set .profile-edit label{
+    .profile-page .profile-page-body .profile-edit label{
         margin: 0px;
         display: inline-block;
     }
     
-    .profile-page .profile-page-body .profile-img-set .profile-edit input{
+    .profile-page .profile-page-body .profile-edit input{
         visibility: visible;
         height: 0px;
         width: 0px;
@@ -977,7 +970,7 @@ audio::-webkit-media-controls-pause-button {
 audio::-webkit-media-controls-panel {
     background-color: white;
 }
-
+/* spinners */
 .loader-div{
     height: 280px;
     width: 280px;
@@ -1020,6 +1013,8 @@ audio::-webkit-media-controls-panel {
     40% { box-shadow: 0 2.5em 0 0 }
   }
       
+/* spinners */
+
 
   .shimmer {
   background: #f6f6f6;
@@ -1044,6 +1039,9 @@ audio::-webkit-media-controls-panel {
     background-position: 200px 0;
   }
 }
+
+
+
 
 
 

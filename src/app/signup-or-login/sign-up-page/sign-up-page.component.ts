@@ -12,6 +12,7 @@ import { SarServiceService } from '../../sar-service.service';
 export class SignUpPageComponent {
 
   itemSelected: string = 'men';
+  picLoaded:any=false
 
   constructor(
     private router: Router,
@@ -29,6 +30,7 @@ export class SignUpPageComponent {
     }
     })
     this.encode() 
+    this.songPicLoaded()
   }
 
   selectedCard(value: any){
@@ -37,6 +39,16 @@ export class SignUpPageComponent {
       this.itemSelected = value;
       console.log(this.itemSelected,'into the selected card',value)
     }
+  }
+  songPicLoaded()
+  {
+  this.picLoaded=false
+    setTimeout(()=>
+    {
+      this.picLoaded=true
+    },1000)
+    console.log("image loaded from the src")
+    //! there should be a shimmer untill the images gets loaded from the assets folder
   }
 
   backToSplash()

@@ -11,8 +11,10 @@
         <div class="main-body-card">
             <div class="welcome-details" *ngIf="!searchType">
                 <div class="welcome-details-set">
-                    <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>
-                    <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>
+                    <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>&nbsp;
+                    <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>&nbsp;
+                    <i class="fas fa-envelope fa-lg" (click)="goToChatPage()"></i>&nbsp;
+                    <i class="fas fa-unlink  fa-lg"></i>&nbsp;
                     <div class="welcome-text">Hello, Chittibabu</div>
                     <div class="welcome-sub-text">What you want to hear today?</div>
                 </div>
@@ -108,19 +110,19 @@
             <div class="music-card">
                 <div class="music-details">
                         <img  [hidden]="!picLoaded" (load)="songPicLoaded()" [src]="songPic" alt="artist Cover" id="cover" />
-                        <div  [hidden]="picLoaded" class="loader-div">
-                            <div class="loader"></div>
-                        </div>
-                    <div class="play-inner-details-set">
-                        <div class="play-details">
-                            <h2 class="music-card-titre">{{songName}}</h2>
-
-                            <!-- <span class="music-card-artist">{{artistName}}</span> -->
-                        </div>
-                        <!-- <div class="play-like">
-                            <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'"(click)="statusAction()"></span>
-                        </div> -->
                     </div>
+                    <div  [hidden]="picLoaded" class="loader-div">
+                        <div class="loader"></div>
+                    </div>
+                <div class="play-inner-details-set">
+                    <div class="play-details">
+                        <h2 class="music-card-titre">{{songName}}</h2>
+
+                        <!-- <span class="music-card-artist">{{artistName}}</span> -->
+                    </div>
+                    <!-- <div class="play-like">
+                        <span class="fa-heart" [ngClass]="songStatus ? 'fas' : 'far'"(click)="statusAction()"></span>
+                    </div> -->
                 </div>
                 <div class="music-card-controllers">
                     <!-- <input type="range" value="0" id="tracker" /> -->
@@ -143,8 +145,11 @@
                         <span class="fas fa-step-backward"></span>
                     </button>
                     <button class="music-card-actions-main" tabindex="0">
-                        <span *ngIf="play" class="fas fa-play" (click)="playAudio(1)"></span>
-                        <span *ngIf="!play" class="fas fa-pause" (click)="playAudio(0)"></span>
+                        <span *ngIf="play && !groupSession" class="fas fa-play" (click)="playAudio(1)"></span>
+                        <span *ngIf="!play && !groupSession" class="fas fa-pause" (click)="playAudio(0)"></span>
+
+                        <!-- <span *ngIf="play && groupSession" class="fas fa-file-audio" (click)="playGrpAudio(1)"></span>
+                        <span *ngIf="!play && groupSession" class="fas fa-plane-departure" (click)="playGrpAudio(0)"></span> -->
                     </button>
                     <button id="forward">
                         <span class="fas fa-step-forward" (click)="playNext()"></span>
@@ -168,7 +173,11 @@
         </div>
         <div class="play-list-options-card-body">
             <li *ngFor="let item of optionsList; let i = index">
-                <div class="play-list-options" (click)="optionSelected(item)">
+                <div class="play-list-options" *ngIf="item.itemName != 'Connect a friend'"  (click)="optionSelected(item)">
+                    <i class="fas fa-{{item.itemIcon}}"></i>
+                    {{item.itemName}}
+                </div>
+                <div class="play-list-options" *ngIf="item.itemName == 'Connect a friend'"  data-target="#exampleModalCenter" data-toggle='modal' (click)="optionSelected(item)">
                     <i class="fas fa-{{item.itemIcon}}"></i>
                     {{item.itemName}}
                 </div>
@@ -187,7 +196,7 @@
                 <ul class="modal-play-list-set">
 
                     <li class="modal-play-list-item" *ngFor="let item of playLists;let i=index">
-                            <div class="album-carousel-card"  [style.background-image]="'url(' + item.s_pic_path + ')'" (click)="functionCall(item,i)" >
+                            <div class="album-carousel-card"  [style.background-image]="'url(' + item.s_pic_path + ')'" (click)="playListfunctionCall(item,i)" >
                             <div>
                                 <!-- <i class="fa-regular fas fa-circle"></i> -->
                                 <i *ngIf="addingToPlayListCheck&&checkedIndex!=i" class="fa-light fas fa-circle" style="color: white;"></i>
@@ -219,6 +228,9 @@
 <app-modal *ngIf="addPlayListVariable"  (confirmModal)="createPlaylist($event)"
 [inputNeeded]="true" modalTitle='Add Playlist'  [showClose]="false" confirmContent="+Add"></app-modal>
 <!-- (confirmModal)="fromModal($event)" -->
+
+<app-modal *ngIf="connectAFrndVar"  (confirmModal)="connectFrnd($event)"
+[inputNeeded]="false" [radioButtonsNeeded]="true" modalTitle='What Are You?'  [showClose]="false" confirmContent="Confirm"></app-modal>
 
 <ng-container *ngIf="openVideo">
     <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>

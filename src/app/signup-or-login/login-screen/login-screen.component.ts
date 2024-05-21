@@ -35,6 +35,7 @@ export class LoginScreenComponent {
   confirmButton: string = '';
   confirmText: string = '';
   noUser: boolean = false;
+  picLoaded:any=false
 
   constructor(
     private _router: Router,
@@ -96,7 +97,16 @@ export class LoginScreenComponent {
       this.resetForm.get('password')?.value
     );
   }
-
+  songPicLoaded()
+  {
+  this.picLoaded=false
+    setTimeout(()=>
+    {
+      this.picLoaded=true
+    },1000)
+    console.log("image loaded from the src")
+    //! there should be a shimmer untill the images gets loaded from the assets folder
+  }
   onBlur(control: string) {
     this.blurControls[control] = true;
     this.wrongCreds = '';

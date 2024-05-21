@@ -11,7 +11,13 @@
     </div>
 </div>
 
-<div class="image-set">
+
+<!-- <img  [hidden]="!picLoaded" (load)="songPicLoaded()" [src]="songPic" alt="artist Cover" id="cover" />
+<div  [hidden]="picLoaded" class="loader-div">
+    <div class="loader"></div>
+</div> -->
+
+<div class="image-set" [hidden]="!picLoaded">
     <div class="image-card" [ngClass]="{'active': itemSelected == 'men'}" (click)="selectedCard('men')">
         <img src="assets/images/login/Drawing_1.svg" alt="login image backgroung">
        <div class="text-alignment-class"> <span >Men</span></div>
@@ -20,6 +26,9 @@
         <img src="assets/images/login/Selfie_1.svg" alt="login image backgroung">
         <div class="text-alignment-class"> <span >Women</span></div>
     </div>
+</div>
+<div  [hidden]="picLoaded" class="loader-div">
+    <div class="loader"></div>
 </div>
 
 <div class="text-alignment-class change-color">

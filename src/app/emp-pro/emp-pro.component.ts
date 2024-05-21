@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/
 import { SignupLoginService } from '../signup-or-login/signup-login.service';
 import { SarServiceService } from '../sar-service.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+
 
 
 @Component({
@@ -18,11 +20,14 @@ export class EmpProComponent {
   updateForm!: FormGroup;
   openConfirmationModal:any=false
   selectedFile:File |null=null;
+  songsListShimmer:any=false
 
 
 constructor(
   private _signupLoginService: SignupLoginService,
   private _sarService: SarServiceService,
+  private toastr: ToastrService
+
 ){
   
 }
@@ -54,6 +59,7 @@ InitUpdateForm() {
 }
 getUserDetails()
 {
+  this.songsListShimmer=true
   this._signupLoginService.userDetails({userID:this.userID}).subscribe((response) => {
     response = this._sarService.decrypt(response.edc);
     if (response.success) {
@@ -61,9 +67,14 @@ getUserDetails()
         response,'these are thes user details');
       this.userDetails = response.data[0];
       this.patchFormValue()
+  this.songsListShimmer=false
+
     } else {
+  this.songsListShimmer=false
+
       //!through toaster message
-      console.log('error while fethcing the recommendations');
+      this.toastr.error('error while fetching userDetails');
+
     }
   });
 }
@@ -97,7 +108,7 @@ saveUpdatedDetails()
           console.log(response,"this is the esponse for updating the profile")
    } else {
           //!through toaster message
-          console.log('error while updating the profile');
+          this.toastr.error('error while updating the user data');
         }
       });
     }

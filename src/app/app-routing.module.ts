@@ -14,7 +14,9 @@ const routes: Routes = [
   {path:'enterDetails',component:SignUpDetalilsEntryComponent},
   {path:'login',component:LoginScreenComponent},
   {path:'musicPlayer',component:MusicPlayerMainComponent},
-  {path:'verify',component:OtpComponent}
+  {path:'verify',component:OtpComponent},
+  {path:'connect',component:ChatScreenComponent},
+
   // {path:'',component:ChatScreenComponent},
 
  

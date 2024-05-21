@@ -1,20 +1,20 @@
 <div class="profile-page">
     <div class="profile-page-header">
-        <div class="header-back-btn"><i class="fas fa-arrow-left" (click)="closeEvent()"></i></div>
+        <div class="header-back-btn"><i class="fas fa-angle-left fa-lg" style="color: #000205" (click)="closeEvent()"></i></div>
         <div class="header-title">My Profile</div>
     </div>
     <div class="profile-page-body">
         <div class="profile-img-set">
             <img src="../../assets/images/profile/9Nq36hXx4y.png" alt="profile">
-            <div *ngIf="update" class="profile-edit">
-                <label for="myfile" class="edit-label">
-                    <i class="far fa-edit"></i>
-                    <input type="file" id="myfile" name="myfile" (change)="onFileSelected($event)">
-                </label>
-            </div>
+        </div>
+        <div *ngIf="update" class="profile-edit">
+            <label for="myfile" class="edit-label">
+                <i class="far fa-edit"></i>
+                <input type="file" id="myfile" name="myfile" (change)="onFileSelected($event)">
+            </label>
         </div>
 
-        <div *ngIf='!update' class="profile-card">
+        <div *ngIf='!update && !songsListShimmer' class="profile-card">
             <div class="data-item-set">
                 <div class="data-value">{{userDetails?.username ? userDetails?.username : '-'}}</div>
                 <div class="data-title">Name</div>
@@ -37,6 +37,10 @@
                 <div class="data-title">Status</div>
             </div>
         </div>
+
+        <ng-container *ngIf="songsListShimmer">
+            <div *ngFor="let item of [1,2,3,4,5]" class="shimmer" ></div>
+        </ng-container>
 
 
 

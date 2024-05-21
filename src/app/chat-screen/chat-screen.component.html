@@ -1,52 +1,53 @@
-<!-- <i class="fa-solid fa-moon"></i> -->
+  <!-- <input value =12345 #joinId>
+<button (click)="joinRoom(joinId.value)"> join</button>
+<button (click)="playStream()"> stream</button> -->
 <div class="chat-container">
     <div class="content-header">
-        <div class="content-icon">
-            <i class="fas fa-chevron-left"></i>
-        </div>
-        <div class="content-main">
-            <div class="image"> 
-                <img src="assets/images/imge.jpg" alt="user 1">
-                <!-- here in the alt need to replace the one who started the chat -->
+        <div class="content-header-left">
+            <div class="content-icon">
+                <i class="fas fa-chevron-left" (click)="navigateToMainMusic()"></i>
             </div>
-            <div class="name">
-                <div class="title ">
-                    Test USer
-                    <!-- current user name -->
+            <div class="content-main">
+                <div class="image"> 
+                    <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/examination-pad/j/u/e/cute-cartoon-girl-flipdecor-original-imagz3m68hukkphh.jpeg?q=20&crop=false" alt="user 1">
+                    <!-- here in the alt need to replace the one who started the chat -->
                 </div>
-                <div class="sub">
-                    4 min active now
-                </div>  
+                <div class="name">
+                    <div class="title ">
+                        {{userID}}
+                        <!-- current user name -->
+                    </div>
+                    <div class="sub">
+                        4 min active now
+                    </div>  
+                </div>
             </div>
+        </div>
+        <div class="content-header-right">
+            <i   class="fas fa-headphones-alt fa-2x"></i>
+            <!-- (click)='groupSessionStared()' -->
         </div>
     </div>
 
+
+    <!-- <audio controls [src]="audioUrl">
+        Your browser does not support the audio tag.
+      </audio> -->
+      
     <div class="content-body">
-        <div class="chat-list">
-            <ul>
-                <li class="chat-list-item">                    
+        <div class="chat-list" *ngFor="let item of messagesArray.reverse()">
+            <ul >
+                <li class="chat-list-item" [ngClass]="{'sender' : item.userId==userID}">                    
                     <div class="chat-list-item-details">
-                        <div class="sender-image">
-                            <img src="assets/images/imge.jpg" alt="">
+                        <div class="sender-image" *ngIf="item.userId!=userID">
+                            <img src="https://rukminim2.flixcart.com/image/850/1000/xif0q/examination-pad/j/u/e/cute-cartoon-girl-flipdecor-original-imagz3m68hukkphh.jpeg?q=20&crop=false" alt="">
+                        </div>
+                        <div class="sender-image" *ngIf="item.userId==userID">
+                            <img src="https://img.freepik.com/free-vector/cute-cool-boy-listening-music-with-headphone-cartoon-vector-icon-illustration-people-music-isolated_138676-10365.jpg?size=338&ext=jpg&ga=GA1.1.44546679.1715731200&semt=ais_user" alt="">
                         </div>
                         <div class="chat-list-item-details-set">
-                            <div class="sender-mess">
-                                hi
-                            </div>
-                            <div class="sender-date">
-                                12:28
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li class="chat-list-item sender">
-                    <div class="chat-list-item-details">
-                        <div class="sender-image">
-                            <img src="assets/images/rece.jpg" alt="">
-                        </div>
-                        <div class="chat-list-item-details-set">
-                            <div class="sender-mess">
-                                hi Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque culpa sapiente hic perferendis doloribus fugit ex! Perferendis repellendus eum soluta nam omnis, cupiditate doloribus alias, non perspiciatis libero maxime hic?
+                            <div  class="sender-mess">
+                            {{item?.message}}
                             </div>
                             <div class="sender-date">
                                 12:28
@@ -59,10 +60,10 @@
     </div>
     <div class="content-footer">
         <div class="input-data">
-            <input type="text" name="" placeholder="Message">
+            <input type="text" name="" placeholder="Message" #message>
         </div>
         <div class="input-send">
-            <i class="fas fa-paper-plane"></i>
+            <i class="fas fa-paper-plane" (click)="sendMessage(message.value)"></i>
         </div>
     </div>
 </div>
