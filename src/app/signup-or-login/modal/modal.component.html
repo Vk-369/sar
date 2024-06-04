@@ -12,6 +12,7 @@
       </div>
       <div *ngIf="!inputNeeded && !radioButtonsNeeded" class="modal-body">
         {{modalBody}}
+        <i class="fas fa-copy" ></i>
       </div>
       <ng-container [formGroup]="inputFieldForm">
         <div *ngIf="inputNeeded && !radioButtonsNeeded">
@@ -21,11 +22,12 @@
         <div class="modal-body" *ngIf="radioButtonsNeeded">
           <div class="form-check">
             <input type="radio" id="radio1" value="0" class="form-check-input" formControlName="radioValue">
-            <label for="radio1" class="form-check-label" data-dismiss="modal" (click)="validate(false)">Host</label>
+            <label for="radio1" class="form-check-label" (click)="connectedAsHost()">Host</label>
           </div>
+          <!-- data-dismiss="modal"  -->
           <div class="form-check">
             <input type="radio" id="radio2" value="1" class="form-check-input" formControlName="radioValue">
-            <label for="radio2" class="form-check-label" (click)="validate(true)">Guest</label>
+            <label for="radio2" class="form-check-label" (click)="connectedAsGuest()">Guest</label>
           </div>
         </div>
       </ng-container>
@@ -35,8 +37,8 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeEvent()">Close</button>
         <!-- only for normal model -->
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent()"
-          *ngIf="showConfirmButton && !inputNeeded && !radioButtonsNeeded">{{confirmContent}}</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent('navigateToMusic')"
+          *ngIf="showConfirmButton && !inputNeeded && !radioButtonsNeeded ">{{confirmContent}}</button>
           <!-- model with input field -->
         <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="confirmEvent('withInput')"
           *ngIf="showConfirmButton && inputNeeded && !radioButtonsNeeded">{{confirmContent}}</button>

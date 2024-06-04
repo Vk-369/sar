@@ -5,4 +5,11 @@
     z-index: 111;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   }
+  .form-check-group {
+    display: flex;
+  }
+  
+  .form-check {
+    margin-right: 10px; /* Adjust spacing as needed */
+  }
   

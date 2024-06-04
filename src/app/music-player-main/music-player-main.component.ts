@@ -16,6 +16,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonService } from '../common/common.service';
 import io from 'socket.io-client';
 import { SocketServiceService } from '../socket-service.service';
+import { env } from 'src/assets/env';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-music-player-main',
@@ -61,6 +63,10 @@ export class MusicPlayerMainComponent implements OnInit {
   checkedIndex: any;
   roomId:any
   isGuest:any
+  urlPrefix:any
+  isConnected:any=false
+  playConnection:any=false
+
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -74,42 +80,41 @@ export class MusicPlayerMainComponent implements OnInit {
     private commonService: CommonService,
     private socketSer: SocketServiceService
   ) {}
+
+
   ngOnInit() {
+    this.urlPrefix=env.apiUrl
+    console.log(env.apiUrl,'this is the api url in the env',this.urlPrefix)
     this.audioPlayer = new Audio(); 
     this.userID = sessionStorage.getItem('userID');
     this.getData();
     this.getRecommendationList({ shuffle: false });
+    this._route.fragment.subscribe((fragment) => {
+      console.log("oninit of main music player component",fragment)
+      if (fragment) {
+        // this.socketSer.socketInit()
+        this.isConnected=true
+        this.fragment = this._sarService.decodeParams(fragment);
+        this.roomId=this.fragment.roomId
+        this.playGroupSessionSong('e','index')//to subscribe the stream
 
-    // this._route.fragment.subscribe((fragment) => {
-    //   if (fragment) {
-    //     this.fragment = this._sarService.decodeParams(fragment);
-    //     if (this.fragment.groupSession) {
-    //       this.groupSession = this.fragment.groupSession;
-    //       this.isGuest=this.fragment.guest
-    //       this.roomId=this.fragment.code
-    //       if(this.isGuest)
-    //         {
-    //           this.socketSer.socketInit(this.userID)
-    //         }
+      }
+    });
+ 
 
-    //     }
-    //     console.log(this.fragment, 'the fragment in the main music component');
-    //   }
-    // });
-
-    // this.socketSer.playSongStream$.subscribe((event)=>
-    //   {
-    //     console.log(event,'thhis is the event form the play pause subscription')
-    //     if(event)
-    //       {
-    //         this.audioPlayer.play();
-    //         this.play = true;
-    //       }
-    //       else{
-    //         this.audioPlayer.pause();
-    //         this.play = false;
-    //       }
-    //   })
+    this.socketSer.playSongStream$.subscribe((event)=>
+      {
+        console.log(event,'thhis is the event form the play pause subscription')
+        if(event==='resume play')
+          {
+            this.audioPlayer.play();
+            this.playConnection = false;
+          }
+          else if(event ==='pause play'){
+            this.audioPlayer.pause();
+            this.playConnection = true;
+          }
+      })
   }
 
  
@@ -157,6 +162,7 @@ export class MusicPlayerMainComponent implements OnInit {
     if (body.shuffle) {
       this.playerType = !this.playerType;
       this.playerOptions = false;
+      console.log('this.playerType 1',this.playerType)
     }
     console.log('into the recommendations list fetching API', body);
     this._signupLoginService
@@ -253,6 +259,7 @@ export class MusicPlayerMainComponent implements OnInit {
   }
   goToChatPage() {
     const params = { ...this.fragment };
+    console.log(params,"()()()()()()",this.fragment)
     const connect = this._sarService.encodeParams(params);
     this.router.navigate(['/connect'], { fragment: connect });
   }
@@ -272,44 +279,113 @@ export class MusicPlayerMainComponent implements OnInit {
   statusAction() {
     this.songStatus = !this.songStatus;
   }
-
+multipleUserSongIndex:any=0
+//will be called only on clicking a particular song
   PlayerAction(e?: any, index?: any) {
     console.log("into the play action function")
-    // if (this.groupSession == 'started') 
-    //   {
-    //     this.playGroupSessionSong(e,index)
-    // }
-    
+    if (this.fragment && this.fragment.roomId) 
+      {
+        console.log(e._id,'this is the e in the connectivity')
+        this.multipleUserSongIndex=index
+        this.fetchSelectedSongForGrp(e._id)//to start the stream
+        // this.playGroupSessionSong(e,index)//to subscribe the stream
+    }
+    else
     {
+      console.log("inot the else statement in which fetch selected song is getting called")
       this.playSongForSingleUser(e, index);
     }
-    this.playerType = !this.playerType;
+    // this.playerType = !this.playerType;
+    this.playerType=true
     this.playerOptions = false;
+    console.log('this.playerType 2',this.playerType)
+
+  }
+timeJumpDuplicate:any
+  playGroupSessionSong(e?: any, index?: any)
+{
+console.log("this is called the funciton")
+
+  // console.log(this.isGuest,this.roomId,this.userID,'*****************')
+  // this.socketSer.playStream({roomId: this.isGuest ? this.roomId : this.userID})
+  this.socketSer.dataChunks$.subscribe(chunks=>
+    {
+          console.log('subscribed')
+          this.dataChunks.push(chunks);
+          this.processAndPlayChunks()
+        }
+      )
+  this.socketSer.metaData$.subscribe((data)=>
+    {
+    this.dataChunks=[]  
+
+          console.log('meta data in the music player file',data)
+          this.songPic = data?.image_url? data?.image_url: '../../assets/images/defaultImage.jpg';
+          this.songName = data?.s_displayName;
+          this.artistName = data?.artist;
+        }
+      )
+  this.socketSer.playNext$.subscribe((data)=>
+    {
+      this.multipleUserSongIndex=data.songIndex
+      console.log(data,'data in the required subscription')
+        }
+      )
+  this.socketSer.playPrev$.subscribe((data)=>
+    {
+      this.multipleUserSongIndex=data.songIndex
+      console.log(data,'data in the required subscription')
+        }
+      )
+  this.socketSer.songSeeking$.subscribe((data)=>
+    {
+      // this.audioPlayer.pause()
+      this.timeJumpDuplicate=data.timeJump
+    this.audioPlayer.currentTime=data.timeJump
+    this.audioPlayer.play()
+        }
+      )
+}
+
+processAndPlayChunks() {
+  this.audioUrl = '';
+  this.audioPlayer.load();
+    this.audioPlayer = this.audioPlayerRef.nativeElement;
+    console.log(this.dataChunks,'this is teh data chunks from the service')
+    const blob = new Blob(this.dataChunks, { type: 'audio/mpeg' }); // Ass uming MP3 format
+    const url = URL.createObjectURL(blob);
+    console.log(this.audioUrl,'this is the audio url')
+    this.audioPlayer.pause()
+    this.audioUrl = url;
+    this.audioPlayer.src = this.audioUrl;
+    
+    console.log("this is the completion of the function process adn play chunks")
+
+    this.playerType=true
   }
 
-//   playGroupSessionSong(e?: any, index?: any)
-// {
-//   console.log(this.isGuest,this.roomId,this.userID,'*****************')
-//   this.socketSer.playStream({roomId: this.isGuest ? this.roomId : this.userID})
-//       this.socketSer.dataChunks$.subscribe(chunks=>
-//         {
-//           this.dataChunks.push(chunks);
-//           this.processAndPlayChunks()
-//         }
-//       )
-// }
-
-// processAndPlayChunks() {
-//     this.audioPlayer = this.audioPlayerRef.nativeElement;
-//     console.log(this.dataChunks,'this is teh data chunks from the service')
-//     const blob = new Blob(this.dataChunks, { type: 'audio/mpeg' }); // Assuming MP3 format
-//     const url = URL.createObjectURL(blob);
-//     this.audioUrl = url;
-//     this.audioPlayer.src = this.audioUrl;
-//     this.audioPlayer.load();
-//   }
+  playGrpAudio(ele: any)
+  {
+  // this.audioPlayer.play()
+    
+  if(ele=='play')
+    {
+      console.log("play group event")
+  // this.audioPlayer.load();
+  // this.play=false
+      this.socketSer.playSong({roomId:this.roomId})
+    }
+    else if(ele=='pause')
+      {
+      // this.play=true
+        console.log('pause group event')
+        this.socketSer.pauseSong({roomId:this.roomId})
+      }
+   
+  }
   playSongForSingleUser(e?: any, index?: any) {
     if (e) {
+      console.log('##################################')
       console.log(e, 'this is the selected song', e?._id);
       this.selectedSong = e._id;
       const body: any = {};
@@ -325,7 +401,22 @@ export class MusicPlayerMainComponent implements OnInit {
       this.currentSongIndex = index;
     }
   }
-  playNext() {
+
+  playNext()
+  {
+    console.log("this is into the play next out of the condition")
+    if(this.roomId && this.roomId.length)
+      {
+        console.log("this is into the play next inside the if condition")
+        this.playNextForMultipleUsers()
+      }
+      else if(!this.roomId)
+        {
+          console.log("this is into the play next into the else condtion")
+          this.playNextForSingleUser()
+        }
+  }
+  playNextForSingleUser() {
     if (this.currentSongIndex < this.recommendations.length - 1) {
       this.audioPlayer.pause();
       this.currentSongIndex += 1;
@@ -335,13 +426,57 @@ export class MusicPlayerMainComponent implements OnInit {
         this.fetchSelectedSong({ s_id: nextSong._id }, true);
         this.songName = nextSong?.s_displayName;
         this.artistName = nextSong?.artist;
-        this.songPic = nextSong?.image_url
-          ? nextSong?.image_url
-          : '../../assets/images/defaultImage.jpg';
+        this.songPic = nextSong?.image_url? nextSong?.image_url: '../../assets/images/defaultImage.jpg';
       }
     }
   }
-  playPrevious() {
+  playNextForMultipleUsers()
+  {
+    if (this.multipleUserSongIndex < this.recommendations.length - 1) {
+      this.multipleUserSongIndex += 1;
+      this.socketSer.playNext({songIndex:this.multipleUserSongIndex,roomId:this.roomId})
+      this.dataChunks=[]
+      this.audioPlayer.pause();
+      const nextSong = this.recommendations[this.multipleUserSongIndex];
+      console.log(nextSong, 'the next song item');
+      if (nextSong) {
+        this.fetchSelectedSongForGrp(nextSong._id)
+        
+      }
+    }
+
+  }
+  playPrevious()
+  {
+    if(this.roomId.length)
+      {
+        console.log("this is into the play next inside the if condition")
+        this.playPrevForMultipleUsers()
+      }
+      else if(!this.roomId.length)
+        {
+          console.log("this is into the play next into the else condtion")
+          this.playPrevForSingleUser()
+        }
+  }
+  playPrevForMultipleUsers()
+{
+  if (this.multipleUserSongIndex > 0) {
+    this.audioPlayer.pause();
+    this.multipleUserSongIndex -= 1;
+    this.socketSer.playPrev({songIndex:this.multipleUserSongIndex,roomId:this.roomId})
+
+    const nextSong = this.recommendations[this.multipleUserSongIndex];
+    console.log(nextSong, 'the next song item');
+    if (nextSong) {
+      this.fetchSelectedSongForGrp(nextSong._id)
+  
+    }
+  }
+
+}
+
+  playPrevForSingleUser() {
     if (this.currentSongIndex > 0) {
       this.audioPlayer.pause();
       this.currentSongIndex -= 1;
@@ -351,17 +486,14 @@ export class MusicPlayerMainComponent implements OnInit {
         this.fetchSelectedSong({ s_id: nextSong._id }, true);
         this.songName = nextSong?.s_displayName;
         this.artistName = nextSong?.artist;
-        this.songPic = nextSong?.image_url
-          ? nextSong?.image_url
-          : '../../assets/images/defaultImage.jpg';
+        this.songPic = nextSong?.image_url? nextSong?.image_url: '../../assets/images/defaultImage.jpg';
       }
     }
   }
 
   fetchSelectedSong(body: any, nextSong?: any) {
-    console.log("this is the fetch seleccted song functiom",body)
-    //this.audioUrl = `http://localhost:3000/get/selected/music/file?s_id=${body.s_id}`;
-    this.audioUrl = `http://192.168.1.23:3000/get/selected/music/file?s_id=${body.s_id}`;
+    console.log("this is the fetch seleccted song functiom",body,this.urlPrefix)
+    this.audioUrl = `${this.urlPrefix}/get/selected/music/file?s_id=${body.s_id}`;
     setTimeout(() => {
       this.audioPlayer = this.audioPlayerRef.nativeElement;
       this.audioPlayer.src = this.audioUrl;
@@ -381,25 +513,23 @@ export class MusicPlayerMainComponent implements OnInit {
     //! there should be a shimmer untill the images gets loaded from the assets folder
   }
 
-  // playGrpAudio(ele: any)
-  // {
-  //   if(ele)
-  //     {
-  //       this.play=false
-  //       this.socketSer.playSong({roomId: this.isGuest ? this.roomId : this.userID})
-  //     }
-  //   else
-  //   {
-  //     this.play=true
-  //     this.socketSer.pauseSong({roomId: this.isGuest ? this.roomId : this.userID})
-  //   }
-  // }
 
 
 
+fetchSelectedSongForGrp(songId:any)
+{
+  console.log(songId,'@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+  //we have to send the song id as well
+  // {roomId:this.roomId,songId:songId}
+  const obj={roomId:this.roomId,songId:songId}
+  console.log(obj,'the obj in the normal component')
+  this.socketSer.playStream(obj)
+
+}
 
   playAudio(ele: any) {
     if (ele) {
+      // this.audioPlayer.currentTime = 30 
       this.audioPlayer.play();
       this.play = false;
     } else {
@@ -407,8 +537,24 @@ export class MusicPlayerMainComponent implements OnInit {
       this.play = true;
     }
   }
+  timeJump:any=0
+  seeking:any=false
+  onSeeking(e:any)
+  {
 
-  // todo code related to this playvideo in  html is commented ..uncomment that during development
+    console.log(e,'this is the event in the seeking function')
+    if(e)
+      {
+        this.seeking=true
+        console.log(e,'this is the seeking event in the audio tag')
+        this.timeJump=this.audioPlayer.currentTime
+          const obj={roomId:this.roomId,timeJump:this.timeJump}
+          if(this.timeJumpDuplicate!=this.audioPlayer.currentTime)
+          this.socketSer.seek(obj)
+      }
+  }
+  
+  
   PlayersOptions() {
     this.playerOptions = !this.playerOptions;
   }
@@ -481,11 +627,14 @@ export class MusicPlayerMainComponent implements OnInit {
       this.playerOptions = false;
       this.playerType = false;
       this.modalActive = true;
+      console.log('this.playerType 3',this.playerType)
+
     } else if (item.itemName == 'Play Video') {
       console.log('into video playing');
       this.playVideo();
     } else if (item.itemName == 'Connect a friend') {
       this.connectAFrndVar = true;
+      this.socketSer.socketInit()
     }
   }
   playVideo() {
@@ -529,10 +678,28 @@ export class MusicPlayerMainComponent implements OnInit {
   connectFrnd(e: any) {
     console.log('connect a frnd event acknowledgment', e);
     {
-      //type - host 1
-      //guest 0
-      const connect = this._sarService.encodeParams({ type: e.value });
-      // this.router.navigate(['/connect'], {fragment:connect});
+  
+      this.playerType=false
+      console.log('this.playerType 4',this.playerType)
+
+      this.playerOptions=false
+      if(e.asHost)//for host
+        {
+          //creating a room using the userID of the host
+          console.log('into the room creation')
+          this.socketSer.createRoom(this.userID)
+          const connect=this._sarService.encodeParams({host:true,guest:false,roomId:this.userID})
+          this.router.navigate(['/musicPlayer'],{fragment:connect});
+        }
+      else if(!e.asHost)//for guest
+        {
+          this.socketSer.joinRoom(e.inputFieldValue)
+
+          const connect=this._sarService.encodeParams({host:false,guest:true,roomId:e.inputFieldValue})
+          this.router.navigate(['/musicPlayer'],{fragment:connect});
+
+
+        }
     }
   }
   showserProf() {

@@ -27,33 +27,22 @@ export class ChatScreenComponent implements OnInit {
   isGuest:any=false
   roomId:any
   ngOnInit() {
-    // this._route.fragment.subscribe((fragment) => {
-    //   if (fragment) {
-    //     this.fragment = this._sarService.decodeParams(fragment);
-    //     console.log(this.fragment,'the fragment in the chat screen component');
-    //     this.isGuest=this.fragment.guest
-    //     this.roomId=this.fragment.code
-    //   }
-    // });
+    // this.socketSer.socketInit()
+    this._route.fragment.subscribe((data) => {
+      console.log('this is teh nogojsfkjsdkj',data)
+      if (data) {
+        console.log('yes there is some data')
+        this.fragment = this._sarService.decodeParams(data);
+        console.log(this.fragment,'the fragment in the chat screen component');
+        this.roomId=this.fragment.roomId
+      }
+    });
     this.userID = sessionStorage.getItem('userID');
-    // this.audio = new Audio();
-    // this.audio.pause();
-    // this.socketSer.socketInit(this.userID)
-    // if(!this.isGuest)
-    //   {
-    //     //this means this user is the host and so need to create a room using his empId
-    //     this.socketSer.createRoom(this.userID)
-    //   }
-    // if(this.isGuest)
-    //   {
-    //     this.socketSer.joinRoom(this.roomId)
-    //   }
-
-    //   this.socketSer.messagesArray$.subscribe((messagesData:any)=>
-    //     {
-    //         this.messagesArray.push(messagesData);
-    //     }
-    //   )
+      this.socketSer.messagesArray$.subscribe((messagesData:any)=>
+        {
+            this.messagesArray.push(messagesData);
+        }
+      )
   }
   audio: any;
   audioUrl: any = '';
@@ -62,17 +51,19 @@ export class ChatScreenComponent implements OnInit {
   sendMessage(message: any) //this is to send the message
    {
     // myArray.unshift(newElement);
-    this.socketSer.sendMessage(message)
+    console.log("into the send message")
+    
+    this.socketSer.sendMessage({message:message,roomId:this.roomId,userId:this.userID})
   }
  
   navigateToMainMusic() {
     this.router.navigate(['/musicPlayer']);
   }
-  // groupSessionStared()
-  // {
-  // const params=this.fragment
+  groupSessionStarted()
+  {
+  const params=this.fragment
   // params['groupSession']='started'
-  //   const connect=this._sarService.encodeParams(params)
-  //   this.router.navigate(['/musicPlayer'],{fragment:connect});
-  // }
+    const connect=this._sarService.encodeParams(params)
+    this.router.navigate(['/musicPlayer'],{fragment:connect});
+  }
 }

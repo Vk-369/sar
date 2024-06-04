@@ -11,10 +11,29 @@
         <div class="main-body-card">
             <div class="welcome-details" *ngIf="!searchType">
                 <div class="welcome-details-set">
-                    <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>&nbsp;
-                    <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>&nbsp;
-                    <i class="fas fa-envelope fa-lg" (click)="goToChatPage()"></i>&nbsp;
-                    <i class="fas fa-unlink  fa-lg"></i>&nbsp;
+                    <!-- Example single danger button -->
+<div class="btn-group">
+    <!-- <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Action
+    </button> -->
+    <i class="fas fa-caret-down fa-2x" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>&nbsp;&nbsp;
+    <div class="dropdown-menu"> 
+      <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>&nbsp;
+      <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>&nbsp;
+      <span *ngIf="!isFullScreen">Maximize</span>
+      <span *ngIf="isFullScreen">Minimize</span>
+      <div class="dropdown-divider"></div>
+      <i class="fas fa-envelope fa-lg "(click)="goToChatPage()"></i>&nbsp;
+      Text
+      <div class="dropdown-divider"></div>
+      <i class="fas fa-ban fa-lg"></i>&nbsp;
+      Stop stream
+     </div>
+  </div>
+
+
+
+             
                     <div class="welcome-text">Hello, Chittibabu</div>
                     <div class="welcome-sub-text">What you want to hear today?</div>
                 </div>
@@ -127,7 +146,7 @@
                 <div class="music-card-controllers">
                     <!-- <input type="range" value="0" id="tracker" /> -->
                     <div class="music-tag">
-                        <audio #audioPlayer controls [src]="audioUrl"
+                        <audio #audioPlayer controls [src]="audioUrl"  (seeked)="onSeeking($event)"
                             controlsList="nodownload noplaybackrate">
                             Your browser does not support the audio element.
                         </audio>
@@ -145,11 +164,11 @@
                         <span class="fas fa-step-backward"></span>
                     </button>
                     <button class="music-card-actions-main" tabindex="0">
-                        <span *ngIf="play && !groupSession" class="fas fa-play" (click)="playAudio(1)"></span>
-                        <span *ngIf="!play && !groupSession" class="fas fa-pause" (click)="playAudio(0)"></span>
+                        <span *ngIf="play && !isConnected" class="fas fa-play" (click)="playAudio(1)"></span>
+                        <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-                        <!-- <span *ngIf="play && groupSession" class="fas fa-file-audio" (click)="playGrpAudio(1)"></span>
-                        <span *ngIf="!play && groupSession" class="fas fa-plane-departure" (click)="playGrpAudio(0)"></span> -->
+                        <span *ngIf="playConnection && isConnected" class="fas fa-play"  (click)="playGrpAudio('play')"></span>
+                        <span *ngIf="!playConnection && isConnected" class="fas fa-pause" (click)="playGrpAudio('pause')"></span>
                     </button>
                     <button id="forward">
                         <span class="fas fa-step-forward" (click)="playNext()"></span>
