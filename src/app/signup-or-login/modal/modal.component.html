@@ -10,10 +10,7 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div *ngIf="!inputNeeded && !radioButtonsNeeded" class="modal-body">
-        {{modalBody}}
-        <i class="fas fa-copy" ></i>
-      </div>
+     
       <ng-container [formGroup]="inputFieldForm">
         <div *ngIf="inputNeeded && !radioButtonsNeeded">
           <input class="form-control" formControlName="inputData">

@@ -66,6 +66,18 @@ constructor(
     this.inputFieldForm.reset()
     $('#exampleModalCenter').modal('hide');
   }
+  copyToClipBoard()
+{
+  navigator.clipboard.writeText(this.userId).then(
+()=>
+  {
+    console.log("copied to the clipboard")
+  }),
+  (err:any)=>
+    {
+      console.log('error while copying the data')
+    }
+}
   confirmEvent(item?: any) {
     if (!item) {
       this.confirmModal.emit(true);

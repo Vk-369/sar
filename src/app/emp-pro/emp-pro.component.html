@@ -5,7 +5,7 @@
     </div>
     <div class="profile-page-body">
         <div class="profile-img-set">
-            <img src="../../assets/images/profile/9Nq36hXx4y.png" alt="profile">
+            <img    src="{{ profilePic }}" alt="profile">
         </div>
         <div *ngIf="update" class="profile-edit">
             <label for="myfile" class="edit-label">
@@ -67,14 +67,35 @@
             </div>
         </div>
     </div>
-<app-modal *ngIf="openConfirmationModal" (confirmModal)="fromModal($event)"></app-modal>
-
     <div class="profile-page-footer">
-        <a class="actiion-btn"  *ngIf="update" data-target="#exampleModalCenter" data-toggle='modal' (click)="update=true;openModal()">Save</a>
+        <a class="actiion-btn"  *ngIf="update" data-target="#updateOrofileModel" data-toggle='modal' (click)="update=true;openModal()">Save</a>
         <a class="actiion-btn" *ngIf="!update" (click)="update=true">Edit</a>
         <a class="actiion-btn">Logout</a>
     </div>
 </div>
+
+<!-- adding a playlist model -->
+<div class="modal fade modal-sm" id="updateOrofileModel" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered " role="document">
+    <div class="modal-content smaller-modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Update</h5>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to Update the profile
+    </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal"(click)='saveTheData()' >Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 
 

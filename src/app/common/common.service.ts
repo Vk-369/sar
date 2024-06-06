@@ -8,6 +8,7 @@ import {
   HttpHeaders,
 } from '@angular/common/http';
 import { SarServiceService } from '../sar-service.service';
+declare var $: any;
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +18,7 @@ export class CommonService {
     private _http: HttpClient,
     private _sarService: SarServiceService
   ) {}
+  
 
   isValidControl(form: FormGroup, control: string): boolean {
     if (!form.invalid) {
@@ -33,7 +35,9 @@ export class CommonService {
     }
     return false;
   }
-
+  modalToggle(model:any,item?: any) {
+    $(`#${model}`).modal(item);
+  }
   getErrorMsg(form: FormGroup, control: string, display: string): string {
     if (form.get(control)?.errors) {
       if (form.get(control)?.errors?.['required']) {

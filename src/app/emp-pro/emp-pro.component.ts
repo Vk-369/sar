@@ -3,6 +3,8 @@ import { SignupLoginService } from '../signup-or-login/signup-login.service';
 import { SarServiceService } from '../sar-service.service';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { HttpClient } from '@angular/common/http';
+import { CommonService } from '../common/common.service';
 
 
 
@@ -19,14 +21,16 @@ export class EmpProComponent {
   update:any=false
   updateForm!: FormGroup;
   openConfirmationModal:any=false
-  selectedFile:File |null=null;
+  selectedFile:any;
   songsListShimmer:any=false
 
 
 constructor(
   private _signupLoginService: SignupLoginService,
   private _sarService: SarServiceService,
-  private toastr: ToastrService
+  private toastr: ToastrService,
+  private http:HttpClient,
+  private _commonSer:CommonService
 
 ){
   
@@ -57,6 +61,7 @@ InitUpdateForm() {
     status: new FormControl('', Validators.required),
   });
 }
+profilePic:any
 getUserDetails()
 {
   this.songsListShimmer=true
@@ -65,7 +70,8 @@ getUserDetails()
     if (response.success) {
       console.log(
         response,'these are thes user details');
-      this.userDetails = response.data[0];
+      this.userDetails = response.data.data[0];
+      this.profilePic=`data:image/jpeg;base64,${response.data.profilePic}`
       this.patchFormValue()
   this.songsListShimmer=false
 
@@ -78,34 +84,31 @@ getUserDetails()
     }
   });
 }
-fromModal(e:any)
+saveTheData(e?:any)
 {
-  if(e)
   this.saveUpdatedDetails()
 }
-onFileSelected(e:any)
-{
-  this.selectedFile = e.target.files[0] as File;
-  console.log(this.selectedFile,'this is the file selected')
+onFileSelected(event: any) {
+  this.selectedFile = event.target.files[0];
 }
 saveUpdatedDetails()
 {
 
   if(this.update)
     {
-      // const formData = new FormData();
-      // if(this.selectedFile)
-      //   {
-      //     console.log('this is the into the selected file if condition')
-      //     formData.append('profilePic', this.selectedFile);
-      //     console.log(this.selectedFile,'the modified file')
-      //   }
-      // console.log(this.updateForm.value,'this is the form value for body')
-      this._signupLoginService.updateProfile({userID:this.userID,userupdatedData:this.updateForm.value}).subscribe((response) => {
+      const formData = new FormData();
+      formData.append('file', this.selectedFile);
+      formData.append('userID',this.userID);
+      formData.append('username',this.updateForm.value.username);
+      formData.append('gender',this.updateForm.value.gender);
+      formData.append('email',this.updateForm.value.email);
+      formData.append('contact',this.updateForm.value.contact);
+      //  this._signupLoginService.updateProfile(/formData).subscribe((response) => {
+      this.http.post<any>('http://localhost:3000/update/user/profile', formData).subscribe((response:any) => {
         response = this._sarService.decrypt(response.edc);
         if (response.success)
            {
-          console.log(response,"this is the esponse for updating the profile")
+          console.log(response,"this is the response for updating the profile")
    } else {
           //!through toaster message
           this.toastr.error('error while updating the user data');
@@ -117,6 +120,7 @@ openModal()
 {
   if(this.update)
   this.openConfirmationModal=true
+this._commonSer.modalToggle('updateOrofileModel','show')
 }
 patchFormValue()
 {

@@ -243,14 +243,63 @@
 </ng-container>
 
 
-<!-- modal for adding a playlist -->
-<app-modal *ngIf="addPlayListVariable"  (confirmModal)="createPlaylist($event)"
-[inputNeeded]="true" modalTitle='Add Playlist'  [showClose]="false" confirmContent="+Add"></app-modal>
-<!-- (confirmModal)="fromModal($event)" -->
 
-<app-modal *ngIf="connectAFrndVar"  (confirmModal)="connectFrnd($event)"
-[inputNeeded]="false" [radioButtonsNeeded]="true" modalTitle='What Are You?'  [showClose]="false" confirmContent="Confirm"></app-modal>
+<div class="modal fade modal-sm" id="connectFrndModel" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered " role="document">
+    <div class="modal-content smaller-modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">What are you?</h5>
+      </div>
+      <ng-container  [formGroup]="inputFieldForm">
+        <div class="modal-body">
+            <div *ngIf="inputFieldForm.value.radioValue==1">
+                <input class="form-control" formControlName="inputData" formControlName="inputData" placeholder="Enter Room Code">
+              </div>
+              <div *ngIf="inputFieldForm.value.radioValue==2">
+                {{userID}}
+                <i class="fas fa-copy" (click)="copyToClipBoard()" ></i>
+              </div>
+            <ng-container *ngIf="inputFieldForm.value.radioValue==''">
+          <div class="form-check">
+            <input type="radio" id="radio1" value="2" class="form-check-input" formControlName="radioValue">
+            <label for="radio1" class="form-check-label" >Host</label>
+          </div>
+          <div class="form-check">
+            <input type="radio" id="radio2" value="1" class="form-check-input" formControlName="radioValue">
+            <label for="radio2" class="form-check-label" >Guest</label>
+          </div>
+        </ng-container>
+        </div>
+      </ng-container>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="connectFrnd()" >confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<ng-container *ngIf="openVideo">
-    <iframe [src]="safeUrl" frameborder="0" allowfullscreen></iframe>
-</ng-container>
+
+<!-- adding a playlist model -->
+<div class="modal fade modal-sm" id="addPlayListModel" tabindex="-1" role="dialog"
+  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered " role="document">
+    <div class="modal-content smaller-modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Add Playlist</h5>
+      </div>
+      <ng-container  [formGroup]="playListForm">
+        <div class="modal-body">
+            <div >
+                <input class="form-control" formControlName="playListName"  placeholder="Enter Playlist Name">
+              </div>
+        </div>
+      </ng-container>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createPlaylist()" >+Add</button>
+      </div>
+    </div>
+  </div>
+</div>
