@@ -2,6 +2,7 @@
 import {
   Component,
   ElementRef,
+  HostListener,
   NgModule,
   OnInit,
   ViewChild,
@@ -27,6 +28,7 @@ declare var $: any;
   styleUrls: ['./music-player-main.component.css'],
 })
 export class MusicPlayerMainComponent implements OnInit {
+  @HostListener('window:scroll', ['$event'])
   songStatus: any = false;
   playerType: any = false;
   playerOptions: any = false;
@@ -63,13 +65,14 @@ export class MusicPlayerMainComponent implements OnInit {
   selectedSong: any;
   dataChunks: any = [];
   checkedIndex: any;
-  roomId: any;
+  roomId: any='';
   isGuest: any;
   urlPrefix: any;
   isConnected: any = false;
   playConnection: any = false;
   inputFieldForm!: FormGroup;
   playListForm!: FormGroup;
+  searchQueryForm!:FormGroup
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -91,6 +94,13 @@ export class MusicPlayerMainComponent implements OnInit {
     this.userID = sessionStorage.getItem('userID');
     this.getData();
     this.getRecommendationList({ shuffle: false });
+
+    if(this.fragment)
+      {
+
+        this.stopStream()
+      }
+
     this._route.fragment.subscribe((fragment) => {
       console.log('oninit of main music player component', fragment);
       if (fragment) {
@@ -98,6 +108,7 @@ export class MusicPlayerMainComponent implements OnInit {
         this.isConnected = true;
         this.fragment = this._sarService.decodeParams(fragment);
         this.roomId = this.fragment.roomId;
+        // this.socketSer.handleSocketEvents()
         this.playGroupSessionSong('e', 'index'); //to subscribe the stream
       }
     });
@@ -114,7 +125,9 @@ export class MusicPlayerMainComponent implements OnInit {
     });
 
     this.initForm();
+    this.searchFormInit()
     this.initPlayListForm()
+    this.getUserDetails()
   }
 
   initForm() {
@@ -124,7 +137,38 @@ export class MusicPlayerMainComponent implements OnInit {
     });
 
   }
+  onScroll() {
+    const scrollPosition = window.scrollY;
+    const documentHeight = document.body.offsetHeight;
+    const windowHeight = window.innerHeight;
+  
+    const reachedBottom = scrollPosition + windowHeight >= documentHeight;
+  console.log(reachedBottom,'this scroll reached the bottom')
+    // If reached bottom and data needs to be loaded, call API
+    // if (reachedBottom && this.canLoadMoreData) {
+    // }
+  }
+
+ searchFormInit()
+ {
+  this.searchQueryForm = new FormGroup({
+    searchField:new FormControl(''),
+  });
  
+
+ }
+min:any
+sec:any
+ secToMinConversion(value:any)
+ {
+ this.min=Math.floor(value/60)
+ this.sec=value%60
+if(this.min<9)
+  this.min='0'+this.min
+if(this.sec<9)
+  this.sec='0'+this.sec
+return (this.min+':'+this.sec)
+ }
   ngAfterViewInit() {
     this.audioPlayerRef.nativeElement.addEventListener('timeupdate', () => {
       this.updateTime();
@@ -137,6 +181,27 @@ export class MusicPlayerMainComponent implements OnInit {
       this.playNext();
     });
   }
+  userDetails:any
+  profilePic:any
+  getUserDetails()
+{
+  this.songsListShimmer=true
+  this._signupLoginService.userDetails({userID:this.userID}).subscribe((response) => {
+    response = this._sarService.decrypt(response.edc);
+    if (response.success) {
+      console.log(
+        response,'these are thes user details');
+      this.userDetails = response.data.data[0];
+      this.profilePic=response.data.profilePic?`data:image/jpeg;base64,${response.data.profilePic}`:
+      '../../assets/images/profile/default profile.jpg'
+
+    } else {
+      //!through toaster message
+      this.toastr.error('error while fetching userDetails');
+
+    }
+  });
+}
   copyToClipBoard() {
     navigator.clipboard.writeText(this.userID).then(() => {
       console.log('copied to the clipboard');
@@ -170,12 +235,19 @@ export class MusicPlayerMainComponent implements OnInit {
   }
 
   //! for default songs list
-  getRecommendationList(body?: any) {
+  getRecommendationList(body?: any,search?:any) {
+    this.isPlaylist=false
+    this.playListName='Recommendations'
+    console.log(search,'>>>>>>>>>>')
     this.songsListShimmer = true;
-    if (body.shuffle) {
+    if (body && body.shuffle) {
       this.playerType = !this.playerType;
       this.playerOptions = false;
       console.log('this.playerType 1', this.playerType);
+    }
+   if(search)
+    {
+      body={searchKey:search['searchKey']}
     }
     console.log('into the recommendations list fetching API', body);
     this._signupLoginService
@@ -190,6 +262,7 @@ export class MusicPlayerMainComponent implements OnInit {
           this.songsListShimmer = false;
 
           this.recommendations = response.data;
+          // this.recommendations.push({'s_displayName':'Load More'})
         } else {
           //!through toaster message
           this.songsListShimmer = false;
@@ -271,10 +344,21 @@ export class MusicPlayerMainComponent implements OnInit {
       });
   }
   goToChatPage() {
+    console.log("into the chat")
     const params = { ...this.fragment };
     console.log(params, '()()()()()()', this.fragment);
     const connect = this._sarService.encodeParams(params);
     this.router.navigate(['/connect'], { fragment: connect });
+  }
+  stopStream()
+  {
+    console.log("stop streaming service")
+    this.isConnected=false
+    this.router.navigate(['/musicPlayer'])
+        this.socketSer.disconnect() 
+        this.roomId=''
+        this.fragment={}//for switching from multiple user to single users
+  
   }
 
   openModal() {
@@ -284,9 +368,28 @@ export class MusicPlayerMainComponent implements OnInit {
   }
   closeModal() {
     this.modalActive = !this.modalActive;
+    this.addingToPlayListCheck=false
   }
   SearchAction() {
     this.searchType = !this.searchType;
+  }
+  resetSearch()
+  {
+    this.searchQueryForm.reset()
+  }
+  searchKey:any
+  searchActionPerformed(){
+    console.log(this.searchQueryForm.value.searchField,'*************')
+    if(this.searchQueryForm?.value?.searchField?.length)
+      {
+        this.searchKey=this.searchQueryForm.value.searchField
+        this.getRecommendationList({shuffle:false},{searchKey:this.searchKey})
+      }
+      else{
+        this.getRecommendationList({shuffle:false})
+
+
+      }
   }
 
   statusAction() {
@@ -451,6 +554,8 @@ export class MusicPlayerMainComponent implements OnInit {
     } else if (!this.roomId) {
       console.log('this is into the play next into the else condtion');
       this.playPrevForSingleUser();
+      // this.playConnection=true
+
     }
   }
   playPrevForMultipleUsers() {
@@ -517,9 +622,12 @@ export class MusicPlayerMainComponent implements OnInit {
     console.log(songId, '@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     //we have to send the song id as well
     // {roomId:this.roomId,songId:songId}
+    // this.play=true
     const obj = { roomId: this.roomId, songId: songId };
     console.log(obj, 'the obj in the normal component');
     this.socketSer.playStream(obj);
+    this.playConnection=false
+
   }
 
   playAudio(ele: any) {
@@ -569,6 +677,8 @@ export class MusicPlayerMainComponent implements OnInit {
         response = this._sarService.decrypt(response.edc);
         if (response.success) {
           console.log(response,'this is the response in the get recommedations list api call');
+          //fetch the list of playlist after adding the new playlist
+          this.fetchListOfPlayLists()
         }
          else {
           //!through toaster message
@@ -596,9 +706,15 @@ export class MusicPlayerMainComponent implements OnInit {
     });
   }
   songsListShimmer: any = false;
+  isPlaylist:any=false
+  playListName:any
   fetchSongsLinkedToPlayList(item: any) {
+    console.log(item,'this is the data of the playlist')
     this.songsListShimmer = true;
-    console.log(this.songsListShimmer, '****************');
+    this.playListName=item.playListName
+    this.isPlaylist=true
+    this.searchType=false
+    console.log(this.songsListShimmer, '****************',this.isPlaylist);
     const body = { playListId: item.p_id };
     this._signupLoginService
       .fetchPlayListLinkedSongs(body)
@@ -648,10 +764,10 @@ export class MusicPlayerMainComponent implements OnInit {
   }
   getData() {
     this.optionsList = [
-      {
-        itemName: 'Like',
-        itemIcon: 'heart',
-      },
+      // {
+      //   itemName: 'Like',
+      //   itemIcon: 'heart',
+      // },
       {
         itemName: 'Add to playlist',
         itemIcon: 'plus-square',
@@ -660,18 +776,18 @@ export class MusicPlayerMainComponent implements OnInit {
         itemName: 'Connect a friend',
         itemIcon: 'link',
       },
-      {
-        itemName: 'Play Video',
-        itemIcon: 'video',
-      },
-      {
-        itemName: 'lyrics',
-        itemIcon: 'music',
-      },
-      {
-        itemName: 'Request a song',
-        itemIcon: 'envelope',
-      },
+      // {
+      //   itemName: 'Play Video',
+      //   itemIcon: 'video',
+      // },
+      // {
+      //   itemName: 'lyrics',
+      //   itemIcon: 'music',
+      // },
+      // {
+      //   itemName: 'Request a song',
+      //   itemIcon: 'envelope',
+      // },
     ];
   }
 
@@ -711,5 +827,7 @@ export class MusicPlayerMainComponent implements OnInit {
   }
   closeView(e: any) {
     if (e) this.userProf = false;
+    this.getUserDetails()
+    this.getRecommendationList({shuffle:false},{searchKey:this.searchKey})
   }
 }

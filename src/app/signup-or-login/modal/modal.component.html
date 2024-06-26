@@ -16,7 +16,7 @@
           <input class="form-control" formControlName="inputData">
         </div>
 
-        <div class="modal-body" *ngIf="radioButtonsNeeded">
+        <div class="modal-body" *ngIf="radioButtonsNeeded" >
           <div class="form-check">
             <input type="radio" id="radio1" value="0" class="form-check-input" formControlName="radioValue">
             <label for="radio1" class="form-check-label" (click)="connectedAsHost()">Host</label>

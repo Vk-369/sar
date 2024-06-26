@@ -5,40 +5,47 @@
                 <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
             </div>
             <div class="header-profile" (click)="showserProf()">
-                <img src="../../assets/images/profile/9Nq36hXx4y.png" alt="Profile Pic">
+                <img [src]="profilePic" alt="Profile Pic">
             </div>
         </div>
         <div class="main-body-card">
             <div class="welcome-details" *ngIf="!searchType">
                 <div class="welcome-details-set">
                     <!-- Example single danger button -->
-<div class="btn-group">
-    <!-- <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="btn-group">
+                        <!-- <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       Action
     </button> -->
-    <i class="fas fa-caret-down fa-2x" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>&nbsp;&nbsp;
-    <div class="dropdown-menu"> 
-      <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg" (click)="fullScreen()"></i>&nbsp;
-      <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" (click)="fullScreen()"></i>&nbsp;
-      <span *ngIf="!isFullScreen">Maximize</span>
-      <span *ngIf="isFullScreen">Minimize</span>
-      <div class="dropdown-divider"></div>
-      <i class="fas fa-envelope fa-lg "(click)="goToChatPage()"></i>&nbsp;
-      Text
-      <div class="dropdown-divider"></div>
-      <i class="fas fa-ban fa-lg"></i>&nbsp;
-      Stop stream
-     </div>
-  </div>
+                        <i class="fas fa-caret-down fa-2x" data-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false"></i>&nbsp;&nbsp;
+                        <div class="dropdown-menu">
+                            <div (click)="fullScreen()">
+                            <i *ngIf="!isFullScreen" class="fa-solid fas fa-expand fa-lg"></i>&nbsp;
+                            <i *ngIf="isFullScreen" class="fa-solid fas fa-compress" ></i>&nbsp;
+                            <span *ngIf="!isFullScreen">Maximize</span>
+                            <span *ngIf="isFullScreen">Minimize</span>
+                        </div>
+                            <div class="dropdown-divider"></div>
+                            <div (click)="goToChatPage()" [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
+                                <i class="fas fa-envelope fa-lg"></i>&nbsp;
+                                Text
+                                <div class="dropdown-divider"></div>
+                            </div>
+                            <div (click)="stopStream()"  [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
+                                <i class="fas fa-ban fa-lg"></i>&nbsp;
+                                Stop stream
+                            </div>
+                        </div>
+                    </div>
 
 
 
-             
-                    <div class="welcome-text">Hello, Chittibabu</div>
+
+                    <div class="welcome-text">Hello, {{userDetails? userDetails.username:'-'}}</div>
                     <div class="welcome-sub-text">What you want to hear today?</div>
                 </div>
-                <div class="search-set" (click)="SearchAction()">
-                    <i class="fas fa-search"></i>
+                <div *ngIf="!isPlaylist" class="search-set" (click)="SearchAction()">
+                    <i class="fas fa-search" (click)="resetSearch()"></i>
                 </div>
             </div>
             <div style="padding: 17.5px 18px;" *ngIf="searchType">
@@ -46,24 +53,25 @@
                     <span class="input-group-addon">
                         <i class="fas fa-search"></i>
                     </span>
-                    <input type="text" value="" placeholder="Search">
+                    <ng-container [formGroup]="searchQueryForm" >
+                    <input type="text" value="" placeholder="Search" formControlName="searchField" (keyup.enter)="searchActionPerformed()">
                     <button (click)="SearchAction()">
                         <i class="fas fa-times"></i>
-                    </button> 
+                    </button>
+                </ng-container>
                 </div>
             </div>
             <div class="sub-title-text">Albums</div>
 
             <div class="album-carousel-set">
-         <div class="album-carousel-card"  [style.background-image]="'url(' +   + ')'" (click)="openModal()">
-                    <div class="play-card">
+                <div class="album-carousel-card"  (click)="openModal()">
+                    <!-- [style.background-image]="'url(' +   + ')'" -->
+                <div class="play-card">
                         <div class="play-card-details">
-                            <div class="play-card-title">Clouds</div>
-                            <div class="play-card-sub">Playd Bone</div>
+                            <div class="play-card-title">Glad to see you</div>
+                            <div class="play-card-sub">You made our day better</div>
                         </div>
-                        <div class="play-card-icon">
-                            <i class="fas fa-play"></i>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -71,23 +79,25 @@
         </div>
         <!-- <div class="time-set">{{item.duration | SecondsToMinutesPipe}}</div> -->
 
-
+        <div class="refresh-button">
         <div class="sub-title-text">Recently Played</div>
-        <ul  *ngIf="!songsListShimmer" class="play-list-set">
+        <i class="fas fa-sync-alt fa-2x" (click)="getRecommendationList({ shuffle: false })"></i>
+    </div>
+        <ul *ngIf="!songsListShimmer" class="play-list-set">
             <ng-container *ngFor="let item of recommendations let i=index">
                 <li>
                     <div class="play-list-set-item" (click)="PlayerAction(item,i);play=true">
                         <div class="play-list-left">
                             <div class="play-list-imag">
-                                <img [src]=item.s_pic_path alt="">
+                                <img [src]=item.s_pic_path  *ngIf="item?.s_displayName!='Load More'" alt="">
                             </div>
                             <div class="play-details-set">
                                 <div class="play-name">{{item?.s_displayName ? item?.s_displayName :'&mdash;' }}</div>
-                                <div class="play-sub-name">{{item?.artist ? item?.artist :'&mdash;' }}</div>
+                                <div class="play-sub-name" *ngIf="item?.s_displayName!='Load More'">{{item?.artist ? item?.artist :'&mdash;' }}</div>
                             </div>
                         </div>
-                        <div class="play-list-right">
-                            <div class="time-set">{{item.duration}}</div>
+                        <div class="play-list-right" *ngIf="item?.s_displayName!='Load More'">
+                            <div class="time-set">{{secToMinConversion(item.duration)}}</div>
                             <div class="play-options">
                                 <a class="">
                                     <i class="far fa-ellipsis-vertical"></i>
@@ -102,7 +112,7 @@
             </ng-container>
         </ul>
         <ng-container *ngIf="songsListShimmer">
-            <div *ngFor="let item of [1,2,3,4,5,6]" class="shimmer" ></div>
+            <div *ngFor="let item of [1,2,3,4,5,6]" class="shimmer"></div>
         </ng-container>
     </div>
 
@@ -120,7 +130,7 @@
                 </div>
                 <div class="player-song-details">
                     <div class="player-title">Playing From Album</div>
-                    <div class="player-album-name">Daddy</div>
+                    <div class="player-album-name">{{playListName}}</div>
                 </div>
                 <div class="player-options" (click)="PlayersOptions()">
                     <i class="fas fa-ellipsis-v"></i>
@@ -128,11 +138,11 @@
             </div>
             <div class="music-card">
                 <div class="music-details">
-                        <img  [hidden]="!picLoaded" (load)="songPicLoaded()" [src]="songPic" alt="artist Cover" id="cover" />
-                    </div>
-                    <div  [hidden]="picLoaded" class="loader-div">
-                        <div class="loader"></div>
-                    </div>
+                    <img [hidden]="!picLoaded" (load)="songPicLoaded()" [src]="songPic" alt="artist Cover" id="cover" />
+                </div>
+                <div [hidden]="picLoaded" class="loader-div">
+                    <div class="loader"></div>
+                </div>
                 <div class="play-inner-details-set">
                     <div class="play-details">
                         <h2 class="music-card-titre">{{songName}}</h2>
@@ -146,7 +156,7 @@
                 <div class="music-card-controllers">
                     <!-- <input type="range" value="0" id="tracker" /> -->
                     <div class="music-tag">
-                        <audio #audioPlayer controls [src]="audioUrl"  (seeked)="onSeeking($event)"
+                        <audio #audioPlayer controls [src]="audioUrl" (seeked)="onSeeking($event)"
                             controlsList="nodownload noplaybackrate">
                             Your browser does not support the audio element.
                         </audio>
@@ -167,8 +177,10 @@
                         <span *ngIf="play && !isConnected" class="fas fa-play" (click)="playAudio(1)"></span>
                         <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-                        <span *ngIf="playConnection && isConnected" class="fas fa-play"  (click)="playGrpAudio('play')"></span>
-                        <span *ngIf="!playConnection && isConnected" class="fas fa-pause" (click)="playGrpAudio('pause')"></span>
+                        <span *ngIf="playConnection && isConnected" class="fas fa-play"
+                            (click)="playGrpAudio('play')"></span>
+                        <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
+                            (click)="playGrpAudio('pause')"></span>
                     </button>
                     <button id="forward">
                         <span class="fas fa-step-forward" (click)="playNext()"></span>
@@ -192,11 +204,13 @@
         </div>
         <div class="play-list-options-card-body">
             <li *ngFor="let item of optionsList; let i = index">
-                <div class="play-list-options" *ngIf="item.itemName != 'Connect a friend'"  (click)="optionSelected(item)">
+                <div class="play-list-options" *ngIf="item.itemName != 'Connect a friend'"
+                    (click)="optionSelected(item)">
                     <i class="fas fa-{{item.itemIcon}}"></i>
                     {{item.itemName}}
                 </div>
-                <div class="play-list-options" *ngIf="item.itemName == 'Connect a friend'"  data-target="#exampleModalCenter" data-toggle='modal' (click)="optionSelected(item)">
+                <div class="play-list-options" *ngIf="item.itemName == 'Connect a friend'"
+                    data-target="#exampleModalCenter" data-toggle='modal' (click)="optionSelected(item)">
                     <i class="fas fa-{{item.itemIcon}}"></i>
                     {{item.itemName}}
                 </div>
@@ -207,32 +221,38 @@
     <div class="modal-wrap" [ngClass]="{'active': modalActive}">
         <div class="modal-set">
             <div class="modal-header">
-                <div class="modal-title" *ngIf="!addingToPlayListCheck" data-target="#exampleModalCenter" data-toggle='modal' (click)="addPlaylist()">+Add Playlist</div>
+                <div class="modal-title" *ngIf="!addingToPlayListCheck" data-target="#exampleModalCenter"
+                    data-toggle='modal' (click)="addPlaylist()">+Add Playlist</div>
                 <div class="modal-close" (click)="closeModal();addingToPlayListCheck=false">
-                    <i class="fas fa-times"></i></div>
+                    <i class="fas fa-times"></i>
+                </div>
             </div>
             <div class="modal-body">
                 <ul class="modal-play-list-set">
 
                     <li class="modal-play-list-item" *ngFor="let item of playLists;let i=index">
-                            <div class="album-carousel-card"  [style.background-image]="'url(' + item.s_pic_path + ')'" (click)="playListfunctionCall(item,i)" >
+                        <div class="album-carousel-card" [style.background-image]="'url(' + (item.s_pic_path?item.s_pic_path:'../../assets/images/noPlayListData.svg' )+ ')'"
+                            (click)="playListfunctionCall(item,i)">
                             <div>
                                 <!-- <i class="fa-regular fas fa-circle"></i> -->
-                                <i *ngIf="addingToPlayListCheck&&checkedIndex!=i" class="fa-light fas fa-circle" style="color: white;"></i>
-                                <i *ngIf="addingToPlayListCheck&&checkedIndex==i" class="fas fa-check-circle" style="color: white;"></i>
+                                <i *ngIf="addingToPlayListCheck&&checkedIndex!=i" class="fa-light fas fa-circle"
+                                    style="color: white;"></i>
+                                <i *ngIf="addingToPlayListCheck&&checkedIndex==i" class="fas fa-check-circle"
+                                    style="color: white;"></i>
                             </div>
-                            <div class="play-card" >
-                                <div class="play-card-details" >
-                                    <div class="play-card-title">{{item.playListName}}</div>
-                                    <!-- <div class="play-card-sub">Playd Bone</div> -->
-                                </div>
-                                <!-- <div class="play-card-icon">
-                                    <i class="fas fa-play"></i>
-                                </div> -->
-                            </div>
+                            
                         </div>
+                        <div class="play-card-details">
+                            <div class="play-card-title">{{item.playListName}}</div>
+                            <!-- <div class="play-card-sub">Playd Bone</div> -->
+                        </div>
+                        <!-- <div class="play-card"> -->
+                            <!-- <div class="play-card-icon">
+                                <i class="fas fa-play"></i>
+                            </div> -->
+                        <!-- </div> -->
                     </li>
-                    
+
                 </ul>
             </div>
         </div>
@@ -245,61 +265,68 @@
 
 
 <div class="modal fade modal-sm" id="connectFrndModel" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered " role="document">
-    <div class="modal-content smaller-modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">What are you?</h5>
-      </div>
-      <ng-container  [formGroup]="inputFieldForm">
-        <div class="modal-body">
-            <div *ngIf="inputFieldForm.value.radioValue==1">
-                <input class="form-control" formControlName="inputData" formControlName="inputData" placeholder="Enter Room Code">
-              </div>
-              <div *ngIf="inputFieldForm.value.radioValue==2">
-                {{userID}}
-                <i class="fas fa-copy" (click)="copyToClipBoard()" ></i>
-              </div>
-            <ng-container *ngIf="inputFieldForm.value.radioValue==''">
-          <div class="form-check">
-            <input type="radio" id="radio1" value="2" class="form-check-input" formControlName="radioValue">
-            <label for="radio1" class="form-check-label" >Host</label>
-          </div>
-          <div class="form-check">
-            <input type="radio" id="radio2" value="1" class="form-check-input" formControlName="radioValue">
-            <label for="radio2" class="form-check-label" >Guest</label>
-          </div>
-        </ng-container>
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+        <div class="modal-content smaller-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">What are you?</h5>
+            </div>
+            <ng-container [formGroup]="inputFieldForm">
+                <div class="modal-body">
+                    <div *ngIf="inputFieldForm.value.radioValue==1">
+                        <input class="form-control" formControlName="inputData" formControlName="inputData"
+                            placeholder="Enter Room Code">
+                    </div>
+                    <div *ngIf="inputFieldForm.value.radioValue==2">
+                        {{userID}}
+                        <i class="fas fa-copy" (click)="copyToClipBoard()"></i>
+                    </div>
+                    <ng-container *ngIf="inputFieldForm.value.radioValue==''">
+                        <div class="check-wrap">
+                        <div class="form-check">
+                            <input type="radio" id="radio1" value="2" class="form-check-input"
+                                formControlName="radioValue">
+                            <label for="radio1" class="form-check-label">Host</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="radio2" value="1" class="form-check-input"
+                                formControlName="radioValue">
+                            <label for="radio2" class="form-check-label">Guest</label>
+                        </div>
+                    </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"
+                    (click)="connectFrnd()">confirm</button>
+            </div>
         </div>
-      </ng-container>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="connectFrnd()" >confirm</button>
-      </div>
     </div>
-  </div>
 </div>
 
 
 <!-- adding a playlist model -->
 <div class="modal fade modal-sm" id="addPlayListModel" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered " role="document">
-    <div class="modal-content smaller-modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLongTitle">Add Playlist</h5>
-      </div>
-      <ng-container  [formGroup]="playListForm">
-        <div class="modal-body">
-            <div >
-                <input class="form-control" formControlName="playListName"  placeholder="Enter Playlist Name">
-              </div>
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+        <div class="modal-content smaller-modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Playlist</h5>
+            </div>
+            <ng-container [formGroup]="playListForm">
+                <div class="modal-body">
+                    <div>
+                        <input class="form-control" formControlName="playListName" placeholder="Enter Playlist Name">
+                    </div>
+                </div>
+            </ng-container>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal"
+                    (click)="createPlaylist()">+Add</button>
+            </div>
         </div>
-      </ng-container>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="createPlaylist()" >+Add</button>
-      </div>
     </div>
-  </div>
 </div>

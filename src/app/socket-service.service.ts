@@ -129,5 +129,9 @@ seek(data:any)
     this.socket.emit('seek',data)
 
 }
+disconnect()
+{
+  this.socket.disconnect()
+}
 
 }

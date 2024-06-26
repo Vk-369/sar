@@ -5,6 +5,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { HttpClient } from '@angular/common/http';
 import { CommonService } from '../common/common.service';
+import { Router } from '@angular/router';
+import { env } from 'src/assets/env';
 
 
 
@@ -23,6 +25,8 @@ export class EmpProComponent {
   openConfirmationModal:any=false
   selectedFile:any;
   songsListShimmer:any=false
+  urlPrefix:any
+
 
 
 constructor(
@@ -30,7 +34,9 @@ constructor(
   private _sarService: SarServiceService,
   private toastr: ToastrService,
   private http:HttpClient,
-  private _commonSer:CommonService
+  private _commonSer:CommonService,
+  private router: Router,
+
 
 ){
   
@@ -38,6 +44,8 @@ constructor(
   ngOnInit()
 {
   
+  this.urlPrefix = env.apiUrl;
+
   this.userID = sessionStorage.getItem('userID');
   this.update=false
 this.getUserDetails()
@@ -55,8 +63,8 @@ closeEvent()
 InitUpdateForm() {
   this.updateForm = new FormGroup({
     username: new FormControl('', Validators.required),
-    gender: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.required, Validators.email]),
+    gender: new FormControl({value: '', disabled: true}),
+    email: new FormControl({value: '', disabled: true}),
     contact: new FormControl('', Validators.required),
     status: new FormControl('', Validators.required),
   });
@@ -71,7 +79,8 @@ getUserDetails()
       console.log(
         response,'these are thes user details');
       this.userDetails = response.data.data[0];
-      this.profilePic=`data:image/jpeg;base64,${response.data.profilePic}`
+      this.profilePic=response.data.profilePic?`data:image/jpeg;base64,${response.data.profilePic}`:
+      '../../assets/images/profile/default profile.jpg'
       this.patchFormValue()
   this.songsListShimmer=false
 
@@ -88,27 +97,45 @@ saveTheData(e?:any)
 {
   this.saveUpdatedDetails()
 }
+previewImage:any
 onFileSelected(event: any) {
   this.selectedFile = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    this.previewImage = reader.result as string; // Store base64 data for preview
+  };
+
+  reader.readAsDataURL(event.target.files[0]);
+
+}
+
+
+logout()
+{
+  this.router.navigate(['/'])
 }
 saveUpdatedDetails()
 {
 
+  console.log(this.updateForm,'this is the form for updation')
   if(this.update)
     {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('userID',this.userID);
-      formData.append('username',this.updateForm.value.username);
-      formData.append('gender',this.updateForm.value.gender);
-      formData.append('email',this.updateForm.value.email);
-      formData.append('contact',this.updateForm.value.contact);
+      formData.append('username',this.updateForm.controls?.['username'].value);
+      formData.append('gender',this.updateForm.controls?.['gender'].value);
+      formData.append('email',this.updateForm.controls?.['email'].value);
+      formData.append('contact',this.updateForm.controls?.['contact'].value);
       //  this._signupLoginService.updateProfile(/formData).subscribe((response) => {
-      this.http.post<any>('http://localhost:3000/update/user/profile', formData).subscribe((response:any) => {
+      this.http.post<any>(`${this.urlPrefix}/update/user/profile`, formData).subscribe((response:any) => {
         response = this._sarService.decrypt(response.edc);
         if (response.success)
            {
           console.log(response,"this is the response for updating the profile")
+          //after updating the data again hit the api for getting the update values of the profile
+          this.getUserDetails()
+          this.update=false
    } else {
           //!through toaster message
           this.toastr.error('error while updating the user data');

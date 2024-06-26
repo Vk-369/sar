@@ -1,11 +1,11 @@
 <div class="profile-page">
     <div class="profile-page-header">
         <div class="header-back-btn"><i class="fas fa-angle-left fa-lg" style="color: #000205" (click)="closeEvent()"></i></div>
-        <div class="header-title">My Profile</div>
+        <div class="header-title" style="color: #000205">My Profile</div>
     </div>
     <div class="profile-page-body">
         <div class="profile-img-set">
-            <img    src="{{ profilePic }}" alt="profile">
+            <img    src="{{ previewImage? previewImage : profilePic }}" alt="profile">
         </div>
         <div *ngIf="update" class="profile-edit">
             <label for="myfile" class="edit-label">
@@ -59,10 +59,7 @@
                 <div class="data-title">Contact</div>
             </div>
             <div class="data-item-set">
-                <input type="radio" id="html"  value=1 formControlName="gender">
-                <label for="html">Male</label>
-                <input type="radio" id="html"  value="women" formControlName="gender"   >
-                <label for="html">Female</label>
+                <input class='form-control bottom-line' formControlName="gender"   placeholder="Gender">
                 <div class="data-title">Gender</div>
             </div>
         </div>
@@ -70,7 +67,7 @@
     <div class="profile-page-footer">
         <a class="actiion-btn"  *ngIf="update" data-target="#updateOrofileModel" data-toggle='modal' (click)="update=true;openModal()">Save</a>
         <a class="actiion-btn" *ngIf="!update" (click)="update=true">Edit</a>
-        <a class="actiion-btn">Logout</a>
+        <a class="actiion-btn" (click)="logout()">Logout</a>
     </div>
 </div>
 
@@ -87,7 +84,7 @@
     </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" >Close</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="previewImage=null" >Cancel</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal"(click)='saveTheData()' >Confirm</button>
       </div>
     </div>

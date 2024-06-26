@@ -286,7 +286,7 @@ html, body {
         list-style: none;
         margin: 0;
         padding: 0;
-        max-height: 350px;
+        /* max-height: 500px; */
         overflow-y: auto;
     }
     .play-list-set li{
@@ -355,7 +355,7 @@ html, body {
 
     }
     .album-carousel-card{
-        /*  background-image: url("https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"); */
+         background-image: url("https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1");
         background-color: #cccccc;
         /* background-size: 2000px; */
         background-position-x: center;
@@ -388,6 +388,13 @@ html, body {
     }
     .play-card .play-card-details{
         width: calc(100% - 32px);
+
+    }
+    .play-card-details{
+        /* width: calc(100% - 32px); */
+        text-align: center;
+        margin-top: 6px;
+        font-weight: 500;
     }
     .play-card .play-card-details .play-card-title{
         font-size: 12px;
@@ -837,7 +844,7 @@ audio::-webkit-media-controls-pause-button {
         top: 0;
     }
     .profile-page .profile-page-header{
-        background: #c8b6f5;
+        background: #a88eec;
 
         text-align: center;
         position: relative;
@@ -857,8 +864,8 @@ audio::-webkit-media-controls-pause-button {
     }
     .profile-page .profile-page-header .header-title{
         color: #fff;
-        font-weight: 400;
-        font-size: 14px;
+        font-weight: 500;
+        font-size: 20px;
     }
     .profile-page .profile-page-body{
         /* background: #fff; */
@@ -941,7 +948,7 @@ audio::-webkit-media-controls-pause-button {
 
     .actiion-btn{
         padding: 10px;
-        background: #db1e00;
+        background:  #7067C2;
         color: #fff;
         border-radius: 20px;
         margin-right: 6px;
@@ -951,12 +958,13 @@ audio::-webkit-media-controls-pause-button {
     }
 .main-body-card
 {
-    width: 310px;
-    height: 280px;
+    max-width: 100%;
+    /* height: 280px; */
     background-color: white;
-    margin: auto;
+    /* margin: auto; */
     border-radius: 8px;
     box-shadow: 5px 5px 10px #888888;
+    margin: 0px 15px 10px;
     
     
 }
@@ -1039,9 +1047,42 @@ audio::-webkit-media-controls-panel {
     background-position: 200px 0;
   }
 }
+.diabled-class{
+    pointer-events: none;
+    color:grey;
+}
+.check-wrap
+{
+    display: flex;
+    .form-check-input{
+        margin-top: 0;
+        margin-right: 12pxA;
+
+    }
+    .form-check{
+        margin-right: 16px;
+    }
+}
 
 
+.screen-wrapper{
+    height: 100%;
+    .play-list-set{
+        height: calc(100% - 410px);
+    }
+}
+.dropdown-menu{
+    padding:10px
+}
+.form-control
+{
+    font-weight: 600;
+    color: #222;
+}
+.refresh-button{
+    display: flex;
+    justify-content: space-between;
 
-
+}
 
 

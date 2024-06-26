@@ -31,7 +31,7 @@ export class SignupOrLoginComponent {
     setTimeout(()=>
     {
       this.picLoaded=true
-    },3000)
+    },1000)
     console.log("image loaded from the src")
     //! there should be a shimmer untill the images gets loaded from the assets folder
   }

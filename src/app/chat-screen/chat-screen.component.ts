@@ -3,6 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import io from 'socket.io-client';
 import { SarServiceService } from '../sar-service.service';
 import { SocketServiceService } from '../socket-service.service';
+import { SignupLoginService } from '../signup-or-login/signup-login.service';
+import { ToastrService } from 'ngx-toastr';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-chat-screen',
@@ -13,7 +16,12 @@ export class ChatScreenComponent implements OnInit {
   constructor(private router: Router,
     private _route: ActivatedRoute,
     private _sarService: SarServiceService,
-    private socketSer:SocketServiceService
+    private socketSer:SocketServiceService,
+    private _signupLoginService: SignupLoginService,
+    private toastr: ToastrService,
+    private _fb: FormBuilder
+
+
   ) {}
 
   userID: any;
@@ -43,17 +51,54 @@ export class ChatScreenComponent implements OnInit {
             this.messagesArray.push(messagesData);
         }
       )
+      this.initMessageForm()
+      this.getUserDetails()
   }
   audio: any;
   audioUrl: any = '';
- 
+  userDetails:any
+  profilePic:any
+  messageForm:any
+  initMessageForm()
+  {
+    this.messageForm = this._fb.group({
+      message:this._fb.control('')
+    });
+    }
+  getUserDetails()
+{
+  this._signupLoginService.userDetails({userID:this.userID}).subscribe((response) => {
+    response = this._sarService.decrypt(response.edc);
+    if (response.success) {
+      console.log(
+        response,'these are thes user details');
+      this.userDetails = response.data.data[0];
+      console.log('these are teh user details in the chat screen component')
+      this.profilePic=response.data.profilePic?`data:image/jpeg;base64,${response.data.profilePic}`:
+      '../../assets/images/profile/default profile.jpg'
 
-  sendMessage(message: any) //this is to send the message
+    } else {
+      //!through toaster message
+      this.toastr.error('error while fetching userDetails');
+
+    }
+  });
+}
+
+  sendMessage() //this is to send the message
    {
-    // myArray.unshift(newElement);
-    console.log("into the send message")
-    
-    this.socketSer.sendMessage({message:message,roomId:this.roomId,userId:this.userID})
+    if(this.messageForm?.value?.message?.length)
+      {
+        // myArray.unshift(newElement);
+        console.log("into the send message")
+        console.log(this.messageForm,'this is the message from')
+        this.socketSer.sendMessage({message:this.messageForm.value.message,roomId:this.roomId,userId:this.userID})
+        this.messageForm.reset()
+      }
+      else{
+        this.toastr.warning('Empty messages cant be sent');
+
+      }
   }
  
   navigateToMainMusic() {
