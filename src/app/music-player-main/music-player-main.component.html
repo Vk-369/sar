@@ -2,7 +2,7 @@
     <div class="screen-wrapper">
         <div class="screen-header">
             <div class="header-list-icon">
-                <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
+                <!-- <i class="fas fa-angle-left fa-lg" style="color: #000205"></i> -->
             </div>
             <div class="header-profile" (click)="showserProf()">
                 <img [src]="profilePic" alt="Profile Pic">
@@ -37,27 +37,26 @@
                             </div>
                         </div>
                     </div>
-
-
-
-
-                    <div class="welcome-text">Hello, {{userDetails? userDetails.username:'-'}}</div>
+                    
+                    <div *ngIf="!profileShimmer" class="welcome-text">Hello, {{userDetails? userDetails.username:'-'}}</div>
+                    <ng-container *ngIf="profileShimmer">
+                        <div *ngFor="let item of [1]" class="shimmer-single"></div>
+                    </ng-container>
                     <div class="welcome-sub-text">What you want to hear today?</div>
                 </div>
-                <div *ngIf="!isPlaylist" class="search-set" (click)="SearchAction()">
+                <div *ngIf="!isPlaylist && !profileShimmer" class="search-set" (click)="SearchAction()">
                     <i class="fas fa-search" (click)="resetSearch()"></i>
                 </div>
             </div>
             <div style="padding: 17.5px 18px;" *ngIf="searchType">
                 <div class="input-group">
-                    <span class="input-group-addon">
+                    <!-- <span class="input-group-addon">
                         <i class="fas fa-search"></i>
-                    </span>
+                    </span> -->
                     <ng-container [formGroup]="searchQueryForm" >
                     <input type="text" value="" placeholder="Search" formControlName="searchField" (keyup.enter)="searchActionPerformed()">
-                    <button (click)="SearchAction()">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <button (click)="searchActionPerformed()" *ngIf="searchQueryForm?.value?.searchField?.length"><i class="fas fa-search"></i></button>
+                    <button (click)="SearchAction()" *ngIf="!searchQueryForm?.value?.searchField?.length"><i class="fas fa-times"></i></button>
                 </ng-container>
                 </div>
             </div>
@@ -83,7 +82,40 @@
         <div class="sub-title-text">Recently Played</div>
         <i class="fas fa-sync-alt fa-2x" (click)="getRecommendationList({ shuffle: false })"></i>
     </div>
-        <ul *ngIf="!songsListShimmer" class="play-list-set">
+    <div class="music-card-actions music-abs">
+        <button id="prev">
+            <span class="fas fa-random" (click)="getRecommendationList({shuffle:true})"></span>
+        </button>
+        <button id="backward" (click)="playPrevious()">
+            <span class="fas fa-step-backward"></span>
+        </button>
+        <button class="music-card-actions-main" tabindex="0">
+            <span *ngIf="play && !isConnected" class="fas fa-play" (click)="playAudio(1)">
+            </span>
+            <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
+
+            <span *ngIf="playConnection && isConnected" class="fas fa-play"
+                (click)="playGrpAudio('play')"></span>
+                <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
+                (click)="playGrpAudio('pause')"></span>
+                <!-- this is getting loading initially -->
+        </button>
+        <button id="forward">
+            <span class="fas fa-step-forward" (click)="playNext()"></span>
+        </button>
+        <button id="next">
+            <span class="fas fa-chevron-up" (click)="playerType=true"></span>
+            
+            <!-- <i class="fa-solid fa-expand"></i> -->
+        </button>
+    </div>
+        <ul *ngIf="!songsListShimmer" class="play-list-set"
+        infiniteScroll 
+        [infiniteScrollDisabled]="false"
+        [infiniteScrollDistance]="1" 
+        [infiniteScrollThrottle]="100" 
+        (scrolled)="loadMoreRecommendations()">
+        
             <ng-container *ngFor="let item of recommendations let i=index">
                 <li>
                     <div class="play-list-set-item" (click)="PlayerAction(item,i);play=true">
@@ -125,8 +157,9 @@
     <div class="palyer-wrapper" [ngClass]="{'active': playerType}">
         <div class="player-card">
             <div class="player-card-header">
+                
                 <div class="player-back">
-                    <i class="fas fa-chevron-down" (click)="playerType=false"></i>
+                    <i class="fas fa-chevron-down" (click)="playerType=false;playerOptions=false"></i>
                 </div>
                 <div class="player-song-details">
                     <div class="player-title">Playing From Album</div>
@@ -166,7 +199,7 @@
                         <span class="music-card-controllers-time" id="info-time">{{totalTime}}</span>
                     </div>
                 </div>
-                <div class="music-card-actions">
+                <div class="music-card-actions" >
                     <button id="prev">
                         <span class="fas fa-random" (click)="getRecommendationList({shuffle:true})"></span>
                     </button>
@@ -174,12 +207,13 @@
                         <span class="fas fa-step-backward"></span>
                     </button>
                     <button class="music-card-actions-main" tabindex="0">
-                        <span *ngIf="play && !isConnected" class="fas fa-play" (click)="playAudio(1)"></span>
+                        <span *ngIf="play && !isConnected" class="fas fa-play" (click)="playAudio(1)">
+                        </span>
                         <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
                         <span *ngIf="playConnection && isConnected" class="fas fa-play"
                             (click)="playGrpAudio('play')"></span>
-                        <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
+                            <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
                             (click)="playGrpAudio('pause')"></span>
                     </button>
                     <button id="forward">
@@ -221,15 +255,14 @@
     <div class="modal-wrap" [ngClass]="{'active': modalActive}">
         <div class="modal-set">
             <div class="modal-header">
-                <div class="modal-title" *ngIf="!addingToPlayListCheck" data-target="#exampleModalCenter"
+                <div class="modal-title" *ngIf="!addingToPlayListCheck && !playlistShimmer" data-target="#exampleModalCenter"
                     data-toggle='modal' (click)="addPlaylist()">+Add Playlist</div>
                 <div class="modal-close" (click)="closeModal();addingToPlayListCheck=false">
                     <i class="fas fa-times"></i>
                 </div>
             </div>
             <div class="modal-body">
-                <ul class="modal-play-list-set">
-
+                <ul class="modal-play-list-set" *ngIf="!playlistShimmer">
                     <li class="modal-play-list-item" *ngFor="let item of playLists;let i=index">
                         <div class="album-carousel-card" [style.background-image]="'url(' + (item.s_pic_path?item.s_pic_path:'../../assets/images/noPlayListData.svg' )+ ')'"
                             (click)="playListfunctionCall(item,i)">
@@ -252,8 +285,13 @@
                             </div> -->
                         <!-- </div> -->
                     </li>
-
                 </ul>
+                <div class="row" *ngIf="playlistShimmer">
+                    <div class="col-6" *ngFor="let item of [1,2,3,4,5,6]">
+                        <div class="block-shimmer">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -272,12 +310,12 @@
                 <h5 class="modal-title" id="exampleModalLongTitle">What are you?</h5>
             </div>
             <ng-container [formGroup]="inputFieldForm">
-                <div class="modal-body">
-                    <div *ngIf="inputFieldForm.value.radioValue==1">
+                <div class="modal-body ">
+                    <div *ngIf="inputFieldForm.value.radioValue==1" >
                         <input class="form-control" formControlName="inputData" formControlName="inputData"
                             placeholder="Enter Room Code">
                     </div>
-                    <div *ngIf="inputFieldForm.value.radioValue==2">
+                    <div *ngIf="inputFieldForm.value.radioValue==2" class="copy-text">
                         {{userID}}
                         <i class="fas fa-copy" (click)="copyToClipBoard()"></i>
                     </div>
@@ -313,7 +351,7 @@
     <div class="modal-dialog modal-dialog-centered " role="document">
         <div class="modal-content smaller-modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Add Playlist</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle" >Add Playlist</h5>
             </div>
             <ng-container [formGroup]="playListForm">
                 <div class="modal-body">
@@ -330,3 +368,4 @@
         </div>
     </div>
 </div>
+

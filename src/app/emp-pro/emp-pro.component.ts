@@ -24,7 +24,7 @@ export class EmpProComponent {
   updateForm!: FormGroup;
   openConfirmationModal:any=false
   selectedFile:any;
-  songsListShimmer:any=false
+  profileShimmer:any=false
   urlPrefix:any
 
 
@@ -70,9 +70,11 @@ InitUpdateForm() {
   });
 }
 profilePic:any
+
 getUserDetails()
 {
-  this.songsListShimmer=true
+  this.profileShimmer=true
+  console.log(this.userID,'this is the user id from the local storage')
   this._signupLoginService.userDetails({userID:this.userID}).subscribe((response) => {
     response = this._sarService.decrypt(response.edc);
     if (response.success) {
@@ -82,10 +84,10 @@ getUserDetails()
       this.profilePic=response.data.profilePic?`data:image/jpeg;base64,${response.data.profilePic}`:
       '../../assets/images/profile/default profile.jpg'
       this.patchFormValue()
-  this.songsListShimmer=false
+  this.profileShimmer=false
 
     } else {
-  this.songsListShimmer=false
+  this.profileShimmer=false
 
       //!through toaster message
       this.toastr.error('error while fetching userDetails');

@@ -157,8 +157,9 @@ export class LoginScreenComponent {
     this.blurControls.mail_id = false;
     this.otpType = 'reset password';
   }
-
+loginShimmer:boolean=false
   authenticate() {
+    this.loginShimmer=true
     console.log(this.loginForm.invalid);
     if (this.loginForm.invalid) {
       this.onBlur('mail_id');
@@ -170,10 +171,12 @@ export class LoginScreenComponent {
       mail_id: this.loginForm.value.mail_id,
       password: this.loginForm.value.password,
     };
+    console.log(body,'this is the login body');
     this._signupLoginService.loginUser(body).subscribe((response) => {
+      
       response = this._sarService.decrypt(response.edc);
-      console.log(response);
       if (response.success) {
+        this.loginShimmer=false
         if (response.login === 'success') {
           console.log(response,'this is the authentication response')
           sessionStorage.setItem('token', response.token);
@@ -182,9 +185,23 @@ export class LoginScreenComponent {
         } else if (response.login === 'verify') {
           this.verify = true;
         } else {
+        this.loginShimmer=false
           this.wrongCreds = response.message;
           this.loginForm.get('password')?.reset();
         }
+      }
+    });
+    console.log('into the authentication');
+  }
+
+  dummypost() {
+    console.log(this.loginForm.invalid);
+  const body:any={body:"dummy"}
+    this._signupLoginService.loginUserDummy(body).subscribe((response) => {
+      response = this._sarService.decrypt(response.edc);
+      console.log(response);
+      if (response.success) {
+        console.log(response,'this is the authentication response')
       }
     });
     console.log('into the authentication');

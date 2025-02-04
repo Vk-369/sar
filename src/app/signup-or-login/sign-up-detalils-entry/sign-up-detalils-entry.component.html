@@ -1,11 +1,15 @@
-<div class="back-icon" (click)="back()">
-    <img src="assets/images/login/back.png" alt="login image backgroung">
+<div (click)="back()" class="common-header-set">
+    <div class="common-heading">
+        <div class="common-header-back-btn">
+            <i class="fas fa-angle-left fa-lg"></i>
+        </div>
+    </div>
 </div>
 <form [formGroup]="signupForm">
     <div class="main">
         <div class="input-card">
             <div class="step-class">
-                STEP :2/7
+                STEP :2
             </div>
             <div class="set-password-text">
                 Personal Details

@@ -470,6 +470,12 @@ html, body {
     .modal-wrap .modal-body{
         padding: 10px 20px;
     }
+    .copy-text
+    {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
     .modal-play-list-set{
         list-style: none;
@@ -507,7 +513,7 @@ html, body {
     .input-group > input {
         flex: 1 0 auto;
         height: 42px;
-        padding: 0px 40px;
+        padding: 0px 8px;
         border-radius: 20px;
         border:none;
         outline:none
@@ -722,6 +728,16 @@ audio::-webkit-media-controls-pause-button {
         border-radius: 50%;
     }
     
+    .music-card-actions.music-abs{
+        position: absolute;
+        bottom: 0px;
+        display: flex;
+        justify-content: space-between;
+        background: white;
+        padding: 10px;
+        margin-bottom: 0px;
+    }
+
     .play-inner-details-set{
         display: flex;
         align-items: center;
@@ -800,6 +816,9 @@ audio::-webkit-media-controls-pause-button {
 
     .play-list-options-card .play-list-options-card-header{
         padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .play-list-options-card .play-list-options-card-header .close{
         display: flex;
@@ -810,7 +829,7 @@ audio::-webkit-media-controls-pause-button {
     .play-list-options-card .play-list-options-card-header .close:before{
         content: '';
         width: 100px;
-        height: 3px;
+        height: 6px;
         background: #6c6c6c;
         border-radius: 6px;
 
@@ -845,22 +864,23 @@ audio::-webkit-media-controls-pause-button {
     }
     .profile-page .profile-page-header{
         background: #a88eec;
-
+        padding: 10px 20px;
         text-align: center;
         position: relative;
-        height: 40px;
         line-height: 40px;
         box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
     }
     .profile-page .profile-page-header .header-back-btn{
         position: absolute;
-        left: 10px;
-        top: 10px;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
         color: #fff;
-        width: 20px;
-        height: 20px;
+        width: 50px;
+        height: 50px;
         text-align: center;
-        line-height: 20px;
+        line-height: 50px;
+        font-size: 20px;
     }
     .profile-page .profile-page-header .header-title{
         color: #fff;
@@ -981,7 +1001,7 @@ audio::-webkit-media-controls-panel {
 /* spinners */
 .loader-div{
     height: 280px;
-    width: 280px;
+    width: 100%;
     border-radius: 20px;
     display: grid;
     place-items: center;
@@ -1024,7 +1044,7 @@ audio::-webkit-media-controls-panel {
 /* spinners */
 
 
-  .shimmer {
+.shimmer {
   background: #f6f6f6;
   background-image: linear-gradient(to right, #f6f6f6 0%, #e6e6e6 20%, #f6f6f6 40%, #e6e6e6 60%, #f6f6f6 80%, #e6e6e6 100%);
   background-size: 800px 100%;
@@ -1068,7 +1088,7 @@ audio::-webkit-media-controls-panel {
 .screen-wrapper{
     height: 100%;
     .play-list-set{
-        height: calc(100% - 410px);
+        height: calc(100% - 486px);
     }
 }
 .dropdown-menu{
@@ -1086,3 +1106,49 @@ audio::-webkit-media-controls-panel {
 }
 
 
+.block-shimmer {
+    background: #f6f6f6;
+    background-image: linear-gradient(to right, #f6f6f6 0%, #e6e6e6 20%, #f6f6f6 40%, #e6e6e6 60%, #f6f6f6 80%, #e6e6e6 100%);
+    background-size: 800px 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+    width:100%;
+    height: 120px; 
+    border-radius: 10px;
+    margin: auto;
+    margin-bottom: 15px;
+}
+
+.profile-shimmer {
+    background: #f6f6f6;
+    background-image: linear-gradient(to right, #f6f6f6 0%, #e6e6e6 20%, #f6f6f6 40%, #e6e6e6 60%, #f6f6f6 80%, #e6e6e6 100%);
+    background-size: 800px 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+    width:200px;
+    height: 200px; 
+    border-radius: 50%;
+    margin: auto;
+    margin-bottom: 15px;
+}
+.shimmer-single {
+    background: #f6f6f6;
+    background-image: linear-gradient(to right, #f6f6f6 0%, #e6e6e6 20%, #f6f6f6 40%, #e6e6e6 60%, #f6f6f6 80%, #e6e6e6 100%);
+    background-size: 800px 100%;
+    animation: shimmer 1.5s infinite ease-in-out;
+    width:200px;
+    height: 10px; 
+    border-radius: 5px;
+    margin: auto;
+    margin-bottom: 15px;
+}
+
+.common-header-set{
+    padding: 10px 20px;
+}
+.common-header-set .common-heading .common-header-back-btn{
+    color: black;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+    font-size: 20px;
+}

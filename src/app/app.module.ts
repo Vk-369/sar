@@ -18,6 +18,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { SecondsToMinutesPipe } from './sec-min-pipe';
 import { ToastrModule } from 'ngx-toastr'; // Import ToastrModule
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 
 @NgModule({
@@ -36,7 +37,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, HttpClientModule,ToastrModule.forRoot(),BrowserAnimationsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, HttpClientModule,ToastrModule.forRoot(),BrowserAnimationsModule,InfiniteScrollModule],
   providers: [SignupLoginService],
   bootstrap: [AppComponent],
   exports:[SecondsToMinutesPipe]

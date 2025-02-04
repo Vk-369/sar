@@ -1,8 +1,11 @@
-<div  (click)="back()">
-    <i class="fas fa-angle-left fa-lg" style="color: #000205"></i>
-
+<div (click)="back()" class="common-header-set" *ngIf="!loginShimmer">
+    <div class="common-heading"  >
+        <div class="common-header-back-btn">
+            <i class="fas fa-angle-left fa-lg"></i>
+        </div>
+    </div>
 </div>
-<div class="main">
+<div class="main" *ngIf="!loginShimmer">
     <div class="main-card" *ngIf="!resetMode">
         <!-- <div class="step-class">
             STEP :3/7
@@ -136,6 +139,13 @@
     <div *ngIf="resetMode">
         <button class="btn-continue" *ngIf="!inReset" (click)="gotoConfirm()">Next</button>
         <button class="btn-continue" *ngIf="inReset" (click)="resetConfirm()">Reset</button>
+    </div>
+</div>
+<div class="loading-shimmer-container" *ngIf="loginShimmer">
+    <div class="loading-shimmer">
+    </div>
+    <div class="loading-text">
+        Please wait while loggin in...
     </div>
 </div>
 <ng-container *ngIf="openModal">

@@ -28,7 +28,7 @@ declare var $: any;
   styleUrls: ['./music-player-main.component.css'],
 })
 export class MusicPlayerMainComponent implements OnInit {
-  @HostListener('window:scroll', ['$event'])
+  // @HostListener('window:scroll', ['$event'])
   songStatus: any = false;
   playerType: any = false;
   playerOptions: any = false;
@@ -47,7 +47,7 @@ export class MusicPlayerMainComponent implements OnInit {
   currentTime: any;
   totalTime: any;
   songPic: any;
-  play: any;
+  play: any=true;
   audioPlayer: any;
   currentSongIndex: any;
   addPlayListVariable: any = false;
@@ -73,6 +73,7 @@ export class MusicPlayerMainComponent implements OnInit {
   inputFieldForm!: FormGroup;
   playListForm!: FormGroup;
   searchQueryForm!:FormGroup
+  showAudioControlsAtBottom:any=false
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -94,6 +95,7 @@ export class MusicPlayerMainComponent implements OnInit {
     this.userID = sessionStorage.getItem('userID');
     this.getData();
     this.getRecommendationList({ shuffle: false });
+    
 
     if(this.fragment)
       {
@@ -114,7 +116,7 @@ export class MusicPlayerMainComponent implements OnInit {
     });
 
     this.socketSer.playSongStream$.subscribe((event) => {
-      console.log(event, 'thhis is the event form the play pause subscription');
+      console.log(event, 'th  his is the event form the play pause subscription');
       if (event === 'resume play') {
         this.audioPlayer.play();
         this.playConnection = false;
@@ -183,19 +185,26 @@ return (this.min+':'+this.sec)
   }
   userDetails:any
   profilePic:any
+  profileShimmer:boolean=false
+  lastPlayedSong:any={}
   getUserDetails()
 {
   this.songsListShimmer=true
+  this.profileShimmer=true
+  console.log(this.userID,'this is the user id from the local storage')
   this._signupLoginService.userDetails({userID:this.userID}).subscribe((response) => {
     response = this._sarService.decrypt(response.edc);
     if (response.success) {
+      this.profileShimmer=false
       console.log(
         response,'these are thes user details');
       this.userDetails = response.data.data[0];
+      console.log(this.userDetails,'this is the user details')
       this.profilePic=response.data.profilePic?`data:image/jpeg;base64,${response.data.profilePic}`:
       '../../assets/images/profile/default profile.jpg'
 
     } else {
+      this.profileShimmer=false
       //!through toaster message
       this.toastr.error('error while fetching userDetails');
 
@@ -233,6 +242,7 @@ return (this.min+':'+this.sec)
       remainingSeconds;
     return formattedTime;
   }
+  defaultSong:any={}
 
   //! for default songs list
   getRecommendationList(body?: any,search?:any) {
@@ -262,7 +272,8 @@ return (this.min+':'+this.sec)
           this.songsListShimmer = false;
 
           this.recommendations = response.data;
-          // this.recommendations.push({'s_displayName':'Load More'})
+          this.defaultSong['_id']=this.recommendations[0]._id
+          this.playSongForSingleUser(this.defaultSong,0)
         } else {
           //!through toaster message
           this.songsListShimmer = false;
@@ -422,14 +433,14 @@ return (this.min+':'+this.sec)
     // console.log(this.isGuest,this.roomId,this.userID,'*****************')
     // this.socketSer.playStream({roomId: this.isGuest ? this.roomId : this.userID})
     this.socketSer.dataChunks$.subscribe((chunks) => {
-      console.log('subscribed');
+      // console.log('subscribed');
       this.dataChunks.push(chunks);
       this.processAndPlayChunks();
     });
     this.socketSer.metaData$.subscribe((data) => {
       this.dataChunks = [];
 
-      console.log('meta data in the music player file', data);
+      // console.log('meta data in the music player file', data);
       this.songPic = data?.image_url
         ? data?.image_url
         : '../../assets/images/defaultImage.jpg';
@@ -439,36 +450,50 @@ return (this.min+':'+this.sec)
     this.socketSer.playNext$.subscribe((data) => {
       this.multipleUserSongIndex = data.songIndex;
       console.log(data, 'data in the required subscription');
+
     });
     this.socketSer.playPrev$.subscribe((data) => {
       this.multipleUserSongIndex = data.songIndex;
       console.log(data, 'data in the required subscription');
+
+
     });
     this.socketSer.songSeeking$.subscribe((data) => {
       // this.audioPlayer.pause()
       this.timeJumpDuplicate = data.timeJump;
       this.audioPlayer.currentTime = data.timeJump;
-      this.audioPlayer.play();
+      // this.audioPlayer.play();
     });
+  }
+  loadMoreRecommendations()
+  {
+    console.log('hit the api for more data')
   }
 
   processAndPlayChunks() {
     this.audioUrl = '';
-    this.audioPlayer.load();
+      this.audioPlayer.load();
     this.audioPlayer = this.audioPlayerRef.nativeElement;
-    console.log(this.dataChunks, 'this is teh data chunks from the service');
+    // console.log(this.dataChunks, 'this is teh data chunks from the service');
     const blob = new Blob(this.dataChunks, { type: 'audio/mpeg' }); // Ass uming MP3 format
     const url = URL.createObjectURL(blob);
-    console.log(this.audioUrl, 'this is the audio url');
+    // console.log(this.audioUrl, 'this is the audio url');
     this.audioPlayer.pause();
     this.audioUrl = url;
     this.audioPlayer.src = this.audioUrl;
 
-    console.log(
-      'this is the completion of the function process adn play chunks'
-    );
+    // console.log(
+    //   'this is the completion of the function process adn play chunks'
+    // );
+
 
     this.playerType = true;
+    
+    // setTimeout(() => {
+    //   this.audioPlayer.play();
+    //   this.playConnection = false;
+    
+    // }, 0);
   }
 
   playGrpAudio(ele: any) {
@@ -476,6 +501,8 @@ return (this.min+':'+this.sec)
 
     if (ele == 'play') {
       console.log('play group event');
+      this.playConnection = false;
+
       // this.audioPlayer.load();
       // this.play=false
       this.socketSer.playSong({ roomId: this.roomId });
@@ -489,7 +516,7 @@ return (this.min+':'+this.sec)
     if (e) {
       console.log('##################################');
       console.log(e, 'this is the selected song', e?._id);
-      this.selectedSong = e._id;
+      this.selectedSong = e._id ;
       const body: any = {};
       body['s_id'] = e.id;
       this.videoId = e.videoId;
@@ -598,7 +625,8 @@ return (this.min+':'+this.sec)
       body,
       this.urlPrefix
     );
-    this.audioUrl = `${this.urlPrefix}/get/selected/music/file?s_id=${body.s_id}`;
+    this.audioUrl = `${this.urlPrefix}/get/selected/music/file?s_id=${body.s_id}&user_ID=${this.userID}`;
+    console.log(this.audioUrl, 'this is the audio url');
     setTimeout(() => {
       this.audioPlayer = this.audioPlayerRef.nativeElement;
       this.audioPlayer.src = this.audioUrl;
@@ -626,7 +654,8 @@ return (this.min+':'+this.sec)
     const obj = { roomId: this.roomId, songId: songId };
     console.log(obj, 'the obj in the normal component');
     this.socketSer.playStream(obj);
-    this.playConnection=false
+    this.playConnection=true
+  
 
   }
 
@@ -689,17 +718,22 @@ return (this.min+':'+this.sec)
     
   }
   playLists: any = [];
+  playlistShimmer:boolean=false
   fetchListOfPlayLists() {
+    this.playlistShimmer=true
     const body = { user_id: this.userID };
     this._signupLoginService.fetchPlayLists(body).subscribe((response:any) => {
       response = this._sarService.decrypt(response.edc);
       if (response.success) {
         this.playLists = response.data;
+    this.playlistShimmer=false
+
         console.log(
           response,
           'this is the response from the play lists fetch api'
         );
       } else {
+    this.playlistShimmer=false
         //!through toaster message
         this.toastr.error('error while fetching playlists');
       }
@@ -744,24 +778,24 @@ return (this.min+':'+this.sec)
       console.log('this.playerType 3', this.playerType);
     } else if (item.itemName == 'Play Video') {
       console.log('into video playing');
-      this.playVideo();
+      // this.playVideo();
     } else if (item.itemName == 'Connect a friend') {
       this.connectAFrndVar = true;
       this.initForm();
       this.commonService.modalToggle('connectFrndModel','show');
-      this.socketSer.socketInit();
+      // this.socketSer.socketInit();
     }
   }
 
 
-  playVideo() {
-    this.openVideo = true;
-    const videoId = 'MoN9ql6Yymw'; // Replace with your video ID
-    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube.com/embed/${videoId}`
-    );
-    console.log(this.safeUrl, 'this is the safe url');
-  }
+  // playVideo() {
+  //   this.openVideo = true;
+  //   const videoId = 'MoN9ql6Yymw'; // Replace with your video ID
+  //   this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+  //     `https://www.youtube.com/embed/${videoId}`
+  //   );
+  //   console.log(this.safeUrl, 'this is the safe url');
+  // }
   getData() {
     this.optionsList = [
       // {
@@ -794,6 +828,8 @@ return (this.min+':'+this.sec)
   guest: any = false;
   connectFrnd(e?: any) {
     {
+      this.socketSer.socketInit();
+
       this.playerType = false;
       console.log('this.playerType 4', this.playerType);
 
@@ -830,4 +866,8 @@ return (this.min+':'+this.sec)
     this.getUserDetails()
     this.getRecommendationList({shuffle:false},{searchKey:this.searchKey})
   }
+
+
+
+  
 }

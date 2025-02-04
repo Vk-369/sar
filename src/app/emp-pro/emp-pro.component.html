@@ -4,9 +4,10 @@
         <div class="header-title" style="color: #000205">My Profile</div>
     </div>
     <div class="profile-page-body">
-        <div class="profile-img-set">
+        <div class="profile-img-set" *ngIf="!profileShimmer">
             <img    src="{{ previewImage? previewImage : profilePic }}" alt="profile">
         </div>
+        <div class="profile-shimmer" *ngIf="profileShimmer"></div>
         <div *ngIf="update" class="profile-edit">
             <label for="myfile" class="edit-label">
                 <i class="far fa-edit"></i>
@@ -14,7 +15,7 @@
             </label>
         </div>
 
-        <div *ngIf='!update && !songsListShimmer' class="profile-card">
+        <div *ngIf='!update && !profileShimmer' class="profile-card">
             <div class="data-item-set">
                 <div class="data-value">{{userDetails?.username ? userDetails?.username : '-'}}</div>
                 <div class="data-title">Name</div>
@@ -38,7 +39,7 @@
             </div>
         </div>
 
-        <ng-container *ngIf="songsListShimmer">
+        <ng-container *ngIf="profileShimmer">
             <div *ngFor="let item of [1,2,3,4,5]" class="shimmer" ></div>
         </ng-container>
 
@@ -66,7 +67,7 @@
     </div>
     <div class="profile-page-footer">
         <a class="actiion-btn"  *ngIf="update" data-target="#updateOrofileModel" data-toggle='modal' (click)="update=true;openModal()">Save</a>
-        <a class="actiion-btn" *ngIf="!update" (click)="update=true">Edit</a>
+        <a class="actiion-btn" *ngIf="!update && !profileShimmer" (click)="update=true">Edit</a>
         <a class="actiion-btn" (click)="logout()">Logout</a>
     </div>
 </div>

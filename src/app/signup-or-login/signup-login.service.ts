@@ -34,6 +34,10 @@ export class SignupLoginService {
     const url = SignupLoginSettings.API.LOGIN_USER;
     return this._commonService.callApi({ url, method: 'LOGIN', body });
   }
+  loginUserDummy(body: Login) {
+    const url = SignupLoginSettings.API.LOGIN_USER_DUMMY;
+    return this._commonService.callApi({ url, method: 'POST', body });
+  }
 
   changePassword(body: Login) {
     const url = SignupLoginSettings.API.RESET_PASSWORD;

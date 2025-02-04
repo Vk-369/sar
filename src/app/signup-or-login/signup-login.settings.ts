@@ -8,6 +8,8 @@ export class SignupLoginSettings {
     RESEND_OTP: env.apiUrl + `/resend/otp`,
     RESET_PASSWORD: env.apiUrl + `/change/password`,
     LOGIN_USER: env.apiUrl + `/login/user`,
+    // LOGIN_USER: env.apiUrl + `/test`,
+    LOGIN_USER_DUMMY: env.apiUrl + `/post/posting`,
     FETCH_RECOMMENDATIONS:env.apiUrl + `/get/recommendations/previouslyPlayed/song`,
     FETCH_SELECTED_SONG:env.apiUrl + `/get/selected/music/file`,
     FETCH_USER_DETAILS:env.apiUrl+`/get/user/profile/details`,

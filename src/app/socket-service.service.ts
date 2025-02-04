@@ -44,7 +44,7 @@ export class SocketServiceService {
       this.messagesArray$.next(data);
     });
     this.socket.on('stream', (data: any) => {
-      console.log(data, 'stream chunks');
+      // console.log(data, 'stream chunks');
       this.dataChunks$.next(data);
     });
     this.socket.on('resume play',()=>
