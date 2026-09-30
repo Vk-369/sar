@@ -4,6 +4,7 @@ import {
   ElementRef,
   HostListener,
   NgModule,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -15,10 +16,9 @@ import { HttpClient } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonService } from '../common/common.service';
-import io from 'socket.io-client';
 import { SocketServiceService } from '../socket-service.service';
 import { env } from 'src/assets/env';
-import { Subject } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 declare var $: any;
 
@@ -27,7 +27,7 @@ declare var $: any;
   templateUrl: './music-player-main.component.html',
   styleUrls: ['./music-player-main.component.css'],
 })
-export class MusicPlayerMainComponent implements OnInit {
+export class MusicPlayerMainComponent implements OnInit, OnDestroy {
   // @HostListener('window:scroll', ['$event'])
   songStatus: any = false;
   playerType: any = false;
@@ -74,6 +74,9 @@ export class MusicPlayerMainComponent implements OnInit {
   playListForm!: FormGroup;
   searchQueryForm!:FormGroup
   showAudioControlsAtBottom:any=false
+  private componentSubscriptions: Subscription[] = [];
+  private pendingPlaybackSync: any;
+  private groupPlaybackSubscriptionsInitialized = false;
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -103,33 +106,48 @@ export class MusicPlayerMainComponent implements OnInit {
         this.stopStream()
       }
 
-    this._route.fragment.subscribe((fragment) => {
+    this.componentSubscriptions.push(this._route.fragment.subscribe((fragment) => {
       console.log('oninit of main music player component', fragment);
+      const previousRoomId = this.roomId;
       if (fragment) {
-        // this.socketSer.socketInit()
         this.isConnected = true;
         this.fragment = this._sarService.decodeParams(fragment);
         this.roomId = this.fragment.roomId;
-        // this.socketSer.handleSocketEvents()
         this.playGroupSessionSong('e', 'index'); //to subscribe the stream
+        this.socketSer.socketInit();
+        this.socketSer.joinRoom(this.roomId);
+      } else {
+        if (previousRoomId) this.socketSer.leaveRoom(previousRoomId);
+        this.roomId = '';
+        this.fragment = undefined;
+        this.isConnected = false;
       }
-    });
+    }));
 
-    this.socketSer.playSongStream$.subscribe((event) => {
+    this.componentSubscriptions.push(this.socketSer.playSongStream$.subscribe((event) => {
       console.log(event, 'th  his is the event form the play pause subscription');
       if (event === 'resume play') {
-        this.audioPlayer.play();
-        this.playConnection = false;
+        this.audioPlayerRef?.nativeElement.play().then(() => {
+          this.playConnection = false;
+        }).catch(() => {
+          this.playConnection = true;
+        });
       } else if (event === 'pause play') {
-        this.audioPlayer.pause();
+        this.audioPlayerRef?.nativeElement.pause();
         this.playConnection = true;
       }
-    });
+    }));
 
     this.initForm();
     this.searchFormInit()
     this.initPlayListForm()
     this.getUserDetails()
+  }
+
+  ngOnDestroy() {
+    this.componentSubscriptions.forEach((subscription) => subscription.unsubscribe());
+    if (this.roomId) this.socketSer.leaveRoom(this.roomId);
+    this.audioPlayerRef?.nativeElement.pause();
   }
 
   initForm() {
@@ -178,8 +196,14 @@ return (this.min+':'+this.sec)
 
     this.audioPlayerRef.nativeElement.addEventListener('loadedmetadata', () => {
       this.updateTotalTime();
+      if (this.pendingPlaybackSync) {
+        const pendingSync = this.pendingPlaybackSync;
+        this.pendingPlaybackSync = undefined;
+        this.applyGroupPlaybackSync(pendingSync);
+      }
     });
     this.audioPlayerRef.nativeElement.addEventListener('ended', () => {
+      if (this.isConnected && !this.fragment?.host) return;
       this.playNext();
     });
   }
@@ -428,72 +452,81 @@ return (this.min+':'+this.sec)
   }
   timeJumpDuplicate: any;
   playGroupSessionSong(e?: any, index?: any) {
-    console.log('this is called the funciton');
+    if (this.groupPlaybackSubscriptionsInitialized) return;
+    this.groupPlaybackSubscriptionsInitialized = true;
 
-    // console.log(this.isGuest,this.roomId,this.userID,'*****************')
-    // this.socketSer.playStream({roomId: this.isGuest ? this.roomId : this.userID})
-    this.socketSer.dataChunks$.subscribe((chunks) => {
-      // console.log('subscribed');
-      this.dataChunks.push(chunks);
-      this.processAndPlayChunks();
-    });
-    this.socketSer.metaData$.subscribe((data) => {
-      this.dataChunks = [];
-
-      // console.log('meta data in the music player file', data);
+    this.componentSubscriptions.push(this.socketSer.metaData$.subscribe((data) => {
       this.songPic = data?.image_url
         ? data?.image_url
         : '../../assets/images/defaultImage.jpg';
       this.songName = data?.s_displayName;
       this.artistName = data?.artist;
-    });
-    this.socketSer.playNext$.subscribe((data) => {
-      this.multipleUserSongIndex = data.songIndex;
-      console.log(data, 'data in the required subscription');
-
-    });
-    this.socketSer.playPrev$.subscribe((data) => {
-      this.multipleUserSongIndex = data.songIndex;
-      console.log(data, 'data in the required subscription');
-
-
-    });
-    this.socketSer.songSeeking$.subscribe((data) => {
-      // this.audioPlayer.pause()
-      this.timeJumpDuplicate = data.timeJump;
-      this.audioPlayer.currentTime = data.timeJump;
-      // this.audioPlayer.play();
-    });
-  }
-  loadMoreRecommendations()
-  {
-    console.log('hit the api for more data')
-  }
-
-  processAndPlayChunks() {
-    this.audioUrl = '';
+      this.selectedSong = data?._id;
+      this.audioUrl = this.getSongAudioUrl(data?._id);
+      this.audioPlayer = this.audioPlayerRef.nativeElement;
+      this.audioPlayer.pause();
+      this.audioPlayer.src = this.audioUrl;
       this.audioPlayer.load();
-    this.audioPlayer = this.audioPlayerRef.nativeElement;
-    // console.log(this.dataChunks, 'this is teh data chunks from the service');
-    const blob = new Blob(this.dataChunks, { type: 'audio/mpeg' }); // Ass uming MP3 format
-    const url = URL.createObjectURL(blob);
-    // console.log(this.audioUrl, 'this is the audio url');
-    this.audioPlayer.pause();
-    this.audioUrl = url;
-    this.audioPlayer.src = this.audioUrl;
+      this.playConnection = true;
+    }));
+    this.componentSubscriptions.push(this.socketSer.playNext$.subscribe((data) => {
+      this.multipleUserSongIndex = data.songIndex;
+    }));
+    this.componentSubscriptions.push(this.socketSer.playPrev$.subscribe((data) => {
+      this.multipleUserSongIndex = data.songIndex;
+    }));
+    this.componentSubscriptions.push(this.socketSer.songSeeking$.subscribe((data) => {
+      this.timeJumpDuplicate = data.timeJump;
+      const audioPlayer = this.audioPlayerRef.nativeElement as HTMLAudioElement;
+      if (Math.abs(audioPlayer.currentTime - Number(data.timeJump)) > 1) {
+        audioPlayer.currentTime = Number(data.timeJump);
+      }
+    }));
+    this.componentSubscriptions.push(this.socketSer.playbackSync$.subscribe((state) => {
+      this.applyGroupPlaybackSync(state);
+    }));
+    this.componentSubscriptions.push(this.socketSer.playbackError$.subscribe(() => {
+      this.playConnection = true;
+      this.toastr.error('Unable to play this song');
+    }));
+  }
 
-    // console.log(
-    //   'this is the completion of the function process adn play chunks'
-    // );
+  private getSongAudioUrl(songId: any) {
+    const userQuery = this.userID
+      ? `&user_ID=${encodeURIComponent(this.userID)}`
+      : '';
+    return `${this.urlPrefix}/get/selected/music/file?s_id=${encodeURIComponent(songId)}${userQuery}`;
+  }
 
+  private applyGroupPlaybackSync(state: any) {
+    if (!state || String(state.roomId) !== String(this.roomId)) return;
+    const audioPlayer = this.audioPlayerRef?.nativeElement as HTMLAudioElement | undefined;
+    if (!audioPlayer || audioPlayer.readyState < 1) {
+      this.pendingPlaybackSync = state;
+      return;
+    }
 
-    this.playerType = true;
-    
-    // setTimeout(() => {
-    //   this.audioPlayer.play();
-    //   this.playConnection = false;
-    
-    // }, 0);
+    const networkDelay = state.playing && Number.isFinite(Number(state.serverTime))
+      ? Math.max(0, (Date.now() - Number(state.serverTime)) / 1000)
+      : 0;
+    const targetTime = Math.max(0, (Number(state.position) || 0) + networkDelay);
+    if (Math.abs(audioPlayer.currentTime - targetTime) > 1) {
+      audioPlayer.currentTime = targetTime;
+    }
+    if (state.playing) {
+      audioPlayer.play().then(() => {
+        this.playConnection = false;
+      }).catch(() => {
+        this.playConnection = true;
+      });
+    } else {
+      audioPlayer.pause();
+      this.playConnection = true;
+    }
+  }
+
+  loadMoreRecommendations() {
+    console.log('hit the api for more data');
   }
 
   playGrpAudio(ele: any) {

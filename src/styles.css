@@ -729,7 +729,7 @@ audio::-webkit-media-controls-pause-button {
     }
     
     .music-card-actions.music-abs{
-        position: absolute;
+        position: fixed;
         bottom: 0px;
         display: flex;
         justify-content: space-between;
@@ -1087,9 +1087,10 @@ audio::-webkit-media-controls-panel {
 
 .screen-wrapper{
     height: 100%;
-    .play-list-set{
-        height: calc(100% - 486px);
-    }
+    overflow: hidden;
+}
+.screen-wrapper .play-list-set{
+    height: calc(100% - 486px);
 }
 .dropdown-menu{
     padding:10px
