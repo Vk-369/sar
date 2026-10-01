@@ -1,23 +1,25 @@
 import { env } from 'src/assets/env';
 
+const apiBaseUrl = env.apiUrl.replace(/\/+$/, '');
+
 export class SignupLoginSettings {
   public static API = {
-    CHECK_MAIL_EXISTS: env.apiUrl + `/check/mail/exists`,
-    SIGNUP_USER: env.apiUrl + `/signup/user`,
-    VERIFY_OTP_SIGNUP: env.apiUrl + `/signup/verify/otp`,
-    RESEND_OTP: env.apiUrl + `/resend/otp`,
-    RESET_PASSWORD: env.apiUrl + `/change/password`,
-    LOGIN_USER: env.apiUrl + `/login/user`,
+    CHECK_MAIL_EXISTS: apiBaseUrl + `/check/mail/exists`,
+    SIGNUP_USER: apiBaseUrl + `/signup/user`,
+    VERIFY_OTP_SIGNUP: apiBaseUrl + `/signup/verify/otp`,
+    RESEND_OTP: apiBaseUrl + `/resend/otp`,
+    RESET_PASSWORD: apiBaseUrl + `/change/password`,
+    LOGIN_USER: apiBaseUrl + `/login/user`,
     // LOGIN_USER: env.apiUrl + `/test`,
-    LOGIN_USER_DUMMY: env.apiUrl + `/post/posting`,
-    FETCH_RECOMMENDATIONS:env.apiUrl + `/get/recommendations/previouslyPlayed/song`,
-    FETCH_SELECTED_SONG:env.apiUrl + `/get/selected/music/file`,
-    FETCH_USER_DETAILS:env.apiUrl+`/get/user/profile/details`,
-    UPDATE_PROFILE:env.apiUrl+`/update/user/profile`,
-    CREATE_PLAYLIST:env.apiUrl+`/create/playlist`,
-    FETCH_PLAYLISTS:env.apiUrl+`/fetch/playlist`,
-    FETCH_SONGS_LINKED_TO_PLAYLIST:env.apiUrl+`/fetch/playlist/linked/songs`,
-    INSERT_SONG_INTO_PLAYLIST:env.apiUrl+`/insert/song/playlist`,
+    LOGIN_USER_DUMMY: apiBaseUrl + `/post/posting`,
+    FETCH_RECOMMENDATIONS:apiBaseUrl + `/get/recommendations/previouslyPlayed/song`,
+    FETCH_SELECTED_SONG:apiBaseUrl + `/get/selected/music/file`,
+    FETCH_USER_DETAILS:apiBaseUrl+`/get/user/profile/details`,
+    UPDATE_PROFILE:apiBaseUrl+`/update/user/profile`,
+    CREATE_PLAYLIST:apiBaseUrl+`/create/playlist`,
+    FETCH_PLAYLISTS:apiBaseUrl+`/fetch/playlist`,
+    FETCH_SONGS_LINKED_TO_PLAYLIST:apiBaseUrl+`/fetch/playlist/linked/songs`,
+    INSERT_SONG_INTO_PLAYLIST:apiBaseUrl+`/insert/song/playlist`,
   };
 }
 
