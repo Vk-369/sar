@@ -74,6 +74,11 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
   playListForm!: FormGroup;
   searchQueryForm!:FormGroup
   showAudioControlsAtBottom:any=false
+  showChatScreen = false;
+  messagesArray: any[] = [];
+  messageForm = new FormGroup({
+    message: new FormControl(''),
+  });
   private componentSubscriptions: Subscription[] = [];
   private pendingPlaybackSync: any;
   private latestPlaybackSync: any;
@@ -81,6 +86,7 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
   private currentRoomSongId: string | null = null;
   private groupPlaybackSubscriptionsInitialized = false;
   playbackNeedsGesture = false;
+  showInitialGroupPlayControl = false;
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -100,6 +106,11 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
     console.log(env.apiUrl, 'this is the api url in the env', this.urlPrefix);
     this.audioPlayer = new Audio();
     this.userID = sessionStorage.getItem('userID');
+    this.componentSubscriptions.push(this.socketSer.messagesArray$.subscribe((message: any) => {
+      if (String(message?.roomId) === String(this.roomId)) {
+        this.messagesArray = [...this.messagesArray, message];
+      }
+    }));
     this.getData();
     this.getRecommendationList({ shuffle: false });
     
@@ -117,6 +128,8 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
         this.isConnected = true;
         this.fragment = this._sarService.decodeParams(fragment);
         this.roomId = this.fragment.roomId;
+        this.showInitialGroupPlayControl = true;
+        this.playConnection = true;
         this.playGroupSessionSong('e', 'index'); //to subscribe the stream
         this.socketSer.socketInit();
         this.socketSer.joinRoom(this.roomId);
@@ -131,12 +144,14 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
     this.componentSubscriptions.push(this.socketSer.playSongStream$.subscribe((event) => {
       console.log(event, 'th  his is the event form the play pause subscription');
       if (event === 'resume play') {
+        this.showInitialGroupPlayControl = false;
         this.audioPlayerRef?.nativeElement.play().then(() => {
           this.playConnection = false;
         }).catch(() => {
           this.playConnection = true;
         });
       } else if (event === 'pause play') {
+        this.showInitialGroupPlayControl = false;
         this.audioPlayerRef?.nativeElement.pause();
         this.playConnection = true;
       }
@@ -390,14 +405,31 @@ return (this.min+':'+this.sec)
       });
   }
   goToChatPage() {
-    console.log("into the chat")
-    const params = { ...this.fragment };
-    console.log(params, '()()()()()()', this.fragment);
-    const connect = this._sarService.encodeParams(params);
-    this.router.navigate(['/connect'], { fragment: connect });
+    if (!this.isConnected || !this.roomId) return;
+    this.showChatScreen = true;
+  }
+
+  navigateToMainMusic() {
+    this.showChatScreen = false;
+  }
+
+  groupSessionStarted() {
+    this.navigateToMainMusic();
+  }
+
+  sendMessage() {
+    const message = String(this.messageForm.controls.message.value || '').trim();
+    if (!message || !this.roomId) {
+      if (!message) this.toastr.warning('Empty messages cant be sent');
+      return;
+    }
+
+    this.socketSer.sendMessage({ message, roomId: this.roomId, userId: this.userID });
+    this.messageForm.reset();
   }
   stopStream() {
     const roomId = this.roomId;
+    this.showChatScreen = false;
     this.isConnected = false;
     this.roomId = '';
     this.fragment = {};
@@ -551,6 +583,8 @@ return (this.min+':'+this.sec)
   private applyGroupPlaybackSync(state: any) {
     if (!state || String(state.roomId) !== String(this.roomId)) return;
     this.latestPlaybackSync = state;
+    this.showInitialGroupPlayControl = false;
+    this.playConnection = !state.playing;
     const audioPlayer = this.audioPlayerRef?.nativeElement as HTMLAudioElement | undefined;
     if (
       !audioPlayer ||
@@ -587,6 +621,7 @@ return (this.min+':'+this.sec)
   }
 
   playGrpAudio(ele: any) {
+    this.showInitialGroupPlayControl = false;
     // this.audioPlayer.play()
 
     if (ele == 'play') {

@@ -124,8 +124,6 @@ constructor(
     this.radioButtonsNeeded = false;
     this.modalTitle = 'Share this code with your friend';
     this.modalBody=this.userId
-    // const connect=this._sarService.encodeParams({guest:false,host:true})
-    // this.router.navigate(['/connect'], {fragment:connect});
   }
   connectedAsGuest()
   {
@@ -135,7 +133,5 @@ constructor(
       this.inputNeeded = true;
       this.radioButtonsNeeded = false;
       this.modalTitle = 'Enter Code';
-      // const connect=this._sarService.encodeParams({guest:true,host:false})
-      // this.router.navigate(['/connect'], {fragment:connect});
   }
 }

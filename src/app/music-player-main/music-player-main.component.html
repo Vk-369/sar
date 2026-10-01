@@ -1,4 +1,5 @@
-<ng-container *ngIf="!userProf">
+<div [hidden]="showChatScreen">
+<div [hidden]="userProf">
     <div class="screen-wrapper">
         <div class="screen-header">
             <div class="header-list-icon">
@@ -26,11 +27,11 @@
                             <span *ngIf="isFullScreen">Minimize</span>
                         </div>
                             <div class="dropdown-divider"></div>
-                            <!-- <div (click)="goToChatPage()" [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
+                            <div  (click)="goToChatPage()"  [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
                                 <i class="fas fa-envelope fa-lg"></i>&nbsp;
-                                Text
+                                Chat
                                 <div class="dropdown-divider"></div>
-                            </div> -->
+                            </div>
                             <div (click)="stopStream()"  [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
                                 <i class="fas fa-ban fa-lg"></i>&nbsp;
                                 Stop stream
@@ -94,9 +95,9 @@
             </span>
             <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-            <span *ngIf="playConnection && isConnected && !playbackNeedsGesture" class="fas fa-play"
+            <span *ngIf="(showInitialGroupPlayControl || playConnection) && isConnected && !playbackNeedsGesture" class="fas fa-play"
                 (click)="playGrpAudio('play')"></span>
-                <span *ngIf="!playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
+                <span *ngIf="!showInitialGroupPlayControl && !playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
                 (click)="playGrpAudio('pause')"></span>
                 <!-- this is getting loading initially -->
         </button>
@@ -214,9 +215,9 @@
                         </span>
                         <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-                        <span *ngIf="playConnection && isConnected && !playbackNeedsGesture" class="fas fa-play"
+                        <span *ngIf="(showInitialGroupPlayControl || playConnection) && isConnected && !playbackNeedsGesture" class="fas fa-play"
                             (click)="playGrpAudio('play')"></span>
-                            <span *ngIf="!playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
+                            <span *ngIf="!showInitialGroupPlayControl && !playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
                             (click)="playGrpAudio('pause')"></span>
                     </button>
                     <button id="forward">
@@ -298,7 +299,7 @@
             </div>
         </div>
     </div>
-</ng-container>
+</div>
 <ng-container *ngIf="userProf">
     <app-emp-pro (closeEmpView)="closeView($event)"></app-emp-pro>
 </ng-container>
@@ -347,9 +348,65 @@
     </div>
 </div>
 
+</div>
+
+<div *ngIf="showChatScreen" class="chat-container">
+    <div class="content-header">
+        <div class="content-header-left">
+            <div class="content-icon">
+                <button type="button" aria-label="Back to music player" (click)="navigateToMainMusic()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="content-main"></div>
+        </div>
+        <div class="content-header-right">
+            <button type="button" aria-label="Return to music player" (click)="groupSessionStarted()">
+                <i class="fas fa-headphones-alt fa-2x"></i>
+            </button>
+        </div>
+    </div>
+
+    <button *ngIf="playbackNeedsGesture" type="button" class="playback-resume-local" (click)="resumePlaybackOnThisDevice()">
+        Resume playback here
+    </button>
+
+    <div class="content-body">
+        <div class="chat-list" *ngFor="let item of messagesArray.slice().reverse()">
+            <ul>
+                <li class="chat-list-item" [ngClass]="{ 'sender': item.userId === userID }">
+                    <div class="chat-list-item-details">
+                        <div class="sender-image" *ngIf="item.userId !== userID">
+                            <img src="../../assets/images/profile/default profile.jpg" alt="">
+                        </div>
+                        <div class="sender-image" *ngIf="item.userId === userID">
+                            <img [src]="profilePic" alt="">
+                        </div>
+                        <div class="chat-list-item-details-set">
+                            <div class="sender-mess">{{ item?.message }}</div>
+                            <div class="sender-date">12:28</div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="content-footer" [formGroup]="messageForm">
+        <div class="input-data">
+            <input type="text" placeholder="Message" formControlName="message" (keyup.enter)="sendMessage()">
+        </div>
+        <div class="input-send">
+            <button type="button" aria-label="Send message" (click)="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
 
 <!-- adding a playlist model -->
-<div class="modal fade modal-sm" id="addPlayListModel" tabindex="-1" role="dialog"
+<div [hidden]="showChatScreen" class="modal fade modal-sm" id="addPlayListModel" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered " role="document">
         <div class="modal-content smaller-modal-content">

@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { SignUpPageComponent } from './signup-or-login/sign-up-page/sign-up-page.component';
 import { SignupOrLoginComponent } from './signup-or-login/signup-or-login.component';
 import { SignUpDetalilsEntryComponent } from './signup-or-login/sign-up-detalils-entry/sign-up-detalils-entry.component';
-import { ChatScreenComponent } from './chat-screen/chat-screen.component';
 import { MusicPlayerMainComponent } from './music-player-main/music-player-main.component';
 import { LoginScreenComponent } from './signup-or-login/login-screen/login-screen.component';
 import { OtpComponent } from './signup-or-login/otp/otp.component';
@@ -15,11 +14,6 @@ const routes: Routes = [
   {path:'login',component:LoginScreenComponent},
   {path:'musicPlayer',component:MusicPlayerMainComponent},
   {path:'verify',component:OtpComponent},
-  {path:'connect',component:ChatScreenComponent},
-
-  // {path:'',component:ChatScreenComponent},
-
- 
 ];
 
 @NgModule({
