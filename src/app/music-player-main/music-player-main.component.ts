@@ -76,7 +76,11 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
   showAudioControlsAtBottom:any=false
   private componentSubscriptions: Subscription[] = [];
   private pendingPlaybackSync: any;
+  private latestPlaybackSync: any;
+  private pendingRoomSong: any;
+  private currentRoomSongId: string | null = null;
   private groupPlaybackSubscriptionsInitialized = false;
+  playbackNeedsGesture = false;
 
   @ViewChild('audioPlayer') audioPlayerRef!: ElementRef;
   constructor(
@@ -146,7 +150,6 @@ export class MusicPlayerMainComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.componentSubscriptions.forEach((subscription) => subscription.unsubscribe());
-    if (this.roomId) this.socketSer.leaveRoom(this.roomId);
     this.audioPlayerRef?.nativeElement.pause();
   }
 
@@ -198,14 +201,22 @@ return (this.min+':'+this.sec)
       this.updateTotalTime();
       if (this.pendingPlaybackSync) {
         const pendingSync = this.pendingPlaybackSync;
-        this.pendingPlaybackSync = undefined;
-        this.applyGroupPlaybackSync(pendingSync);
+        if (String(pendingSync.songId) === this.currentRoomSongId) {
+          this.pendingPlaybackSync = undefined;
+          this.applyGroupPlaybackSync(pendingSync);
+        }
       }
     });
     this.audioPlayerRef.nativeElement.addEventListener('ended', () => {
       if (this.isConnected && !this.fragment?.host) return;
       this.playNext();
     });
+
+    if (this.pendingRoomSong) {
+      const pendingSong = this.pendingRoomSong;
+      this.pendingRoomSong = undefined;
+      this.setGroupRoomSong(pendingSong);
+    }
   }
   userDetails:any
   profilePic:any
@@ -385,15 +396,22 @@ return (this.min+':'+this.sec)
     const connect = this._sarService.encodeParams(params);
     this.router.navigate(['/connect'], { fragment: connect });
   }
-  stopStream()
-  {
-    console.log("stop streaming service")
-    this.isConnected=false
-    this.router.navigate(['/musicPlayer'])
-        this.socketSer.disconnect() 
-        this.roomId=''
-        this.fragment={}//for switching from multiple user to single users
-  
+  stopStream() {
+    const roomId = this.roomId;
+    this.isConnected = false;
+    this.roomId = '';
+    this.fragment = {};
+    this.playConnection = true;
+    this.playbackNeedsGesture = false;
+    this.audioPlayerRef?.nativeElement.pause();
+
+    const disconnect = () => this.socketSer.disconnect();
+    if (roomId) {
+      this.socketSer.leaveRoom(roomId).finally(disconnect);
+    } else {
+      disconnect();
+    }
+    this.router.navigate(['/musicPlayer']);
   }
 
   openModal() {
@@ -456,17 +474,14 @@ return (this.min+':'+this.sec)
     this.groupPlaybackSubscriptionsInitialized = true;
 
     this.componentSubscriptions.push(this.socketSer.metaData$.subscribe((data) => {
+      if (data?.roomId && String(data.roomId) !== String(this.roomId)) return;
       this.songPic = data?.image_url
         ? data?.image_url
         : '../../assets/images/defaultImage.jpg';
       this.songName = data?.s_displayName;
       this.artistName = data?.artist;
       this.selectedSong = data?._id;
-      this.audioUrl = this.getSongAudioUrl(data?._id);
-      this.audioPlayer = this.audioPlayerRef.nativeElement;
-      this.audioPlayer.pause();
-      this.audioPlayer.src = this.audioUrl;
-      this.audioPlayer.load();
+      this.setGroupRoomSong(data);
       this.playConnection = true;
     }));
     this.componentSubscriptions.push(this.socketSer.playNext$.subscribe((data) => {
@@ -498,10 +513,50 @@ return (this.min+':'+this.sec)
     return `${this.urlPrefix}/get/selected/music/file?s_id=${encodeURIComponent(songId)}${userQuery}`;
   }
 
+  private setGroupRoomSong(song: any) {
+    if (!song?._id) return;
+    const audioPlayer = this.audioPlayerRef?.nativeElement as HTMLAudioElement | undefined;
+    if (!audioPlayer) {
+      this.pendingRoomSong = song;
+      return;
+    }
+
+    const songId = String(song._id);
+    if (songId === this.currentRoomSongId && audioPlayer.src) return;
+    this.currentRoomSongId = songId;
+    this.audioUrl = this.getSongAudioUrl(songId);
+    audioPlayer.pause();
+    audioPlayer.src = this.audioUrl;
+    audioPlayer.load();
+  }
+
+  resumePlaybackOnThisDevice() {
+    const audioPlayer = this.audioPlayerRef?.nativeElement as HTMLAudioElement | undefined;
+    if (!audioPlayer) return;
+    const latestSync = this.latestPlaybackSync;
+    if (latestSync && String(latestSync.songId) === this.currentRoomSongId) {
+      const networkDelay = latestSync.playing && Number.isFinite(Number(latestSync.serverTime))
+        ? Math.max(0, (Date.now() - Number(latestSync.serverTime)) / 1000)
+        : 0;
+      audioPlayer.currentTime = Math.max(0, (Number(latestSync.position) || 0) + networkDelay);
+    }
+    audioPlayer.play().then(() => {
+      this.playbackNeedsGesture = false;
+      this.playConnection = false;
+    }).catch(() => {
+      this.playbackNeedsGesture = true;
+    });
+  }
+
   private applyGroupPlaybackSync(state: any) {
     if (!state || String(state.roomId) !== String(this.roomId)) return;
+    this.latestPlaybackSync = state;
     const audioPlayer = this.audioPlayerRef?.nativeElement as HTMLAudioElement | undefined;
-    if (!audioPlayer || audioPlayer.readyState < 1) {
+    if (
+      !audioPlayer ||
+      audioPlayer.readyState < 1 ||
+      String(state.songId) !== this.currentRoomSongId
+    ) {
       this.pendingPlaybackSync = state;
       return;
     }
@@ -516,12 +571,14 @@ return (this.min+':'+this.sec)
     if (state.playing) {
       audioPlayer.play().then(() => {
         this.playConnection = false;
+        this.playbackNeedsGesture = false;
       }).catch(() => {
-        this.playConnection = true;
+        this.playbackNeedsGesture = true;
       });
     } else {
       audioPlayer.pause();
       this.playConnection = true;
+      this.playbackNeedsGesture = false;
     }
   }
 

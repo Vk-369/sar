@@ -27,13 +27,18 @@
         </div>
     </div>
 
+    <audio #roomAudio preload="auto" hidden (loadedmetadata)="onRoomAudioMetadataLoaded()"></audio>
+
+    <button *ngIf="playbackNeedsGesture" type="button" class="playback-sync-button" (click)="resumeRoomAudio()">
+        Tap to sync playback
+    </button>
 
     <!-- <audio controls [src]="audioUrl">
         Your browser does not support the audio tag.
       </audio> -->
       
     <div class="content-body">
-        <div class="chat-list" *ngFor="let item of messagesArray.reverse()">
+        <div class="chat-list" *ngFor="let item of messagesArray.slice().reverse()">
             <ul >
                 <li class="chat-list-item" [ngClass]="{'sender' : item.userId==userID}">                    
                     <div class="chat-list-item-details">

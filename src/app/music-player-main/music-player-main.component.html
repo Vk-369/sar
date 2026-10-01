@@ -26,11 +26,11 @@
                             <span *ngIf="isFullScreen">Minimize</span>
                         </div>
                             <div class="dropdown-divider"></div>
-                            <div (click)="goToChatPage()" [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
+                            <!-- <div (click)="goToChatPage()" [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
                                 <i class="fas fa-envelope fa-lg"></i>&nbsp;
                                 Text
                                 <div class="dropdown-divider"></div>
-                            </div>
+                            </div> -->
                             <div (click)="stopStream()"  [ngClass]="{'diabled-class':(!roomId.length || !isConnected)}">
                                 <i class="fas fa-ban fa-lg"></i>&nbsp;
                                 Stop stream
@@ -94,9 +94,9 @@
             </span>
             <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-            <span *ngIf="playConnection && isConnected" class="fas fa-play"
+            <span *ngIf="playConnection && isConnected && !playbackNeedsGesture" class="fas fa-play"
                 (click)="playGrpAudio('play')"></span>
-                <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
+                <span *ngIf="!playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
                 (click)="playGrpAudio('pause')"></span>
                 <!-- this is getting loading initially -->
         </button>
@@ -109,6 +109,9 @@
             <!-- <i class="fa-solid fa-expand"></i> -->
         </button>
     </div>
+    <button *ngIf="playbackNeedsGesture && isConnected" type="button" class="playback-resume-local" (click)="resumePlaybackOnThisDevice()">
+        Resume here
+    </button>
         <ul *ngIf="!songsListShimmer" class="play-list-set"
         infiniteScroll 
         [infiniteScrollDisabled]="false"
@@ -211,9 +214,9 @@
                         </span>
                         <span *ngIf="!play && !isConnected" class="fas fa-pause" (click)="playAudio(0)"></span>
 
-                        <span *ngIf="playConnection && isConnected" class="fas fa-play"
+                        <span *ngIf="playConnection && isConnected && !playbackNeedsGesture" class="fas fa-play"
                             (click)="playGrpAudio('play')"></span>
-                            <span *ngIf="!playConnection && isConnected" class="fas fa-pause"
+                            <span *ngIf="!playConnection && isConnected && !playbackNeedsGesture" class="fas fa-pause"
                             (click)="playGrpAudio('pause')"></span>
                     </button>
                     <button id="forward">

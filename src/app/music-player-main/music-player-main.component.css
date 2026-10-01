@@ -1,0 +1,15 @@
+.playback-resume-local {
+	position: fixed;
+	z-index: 20;
+	left: 50%;
+	bottom: 5.5rem;
+	transform: translateX(-50%);
+	border: 0;
+	border-radius: 4px;
+	padding: 0.6rem 1rem;
+	background: #176d62;
+	color: #fff;
+	font: inherit;
+	box-shadow: 0 2px 10px rgb(0 0 0 / 18%);
+	cursor: pointer;
+}

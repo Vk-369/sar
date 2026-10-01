@@ -73,11 +73,23 @@ export class SocketServiceService {
     if (this.socket?.connected) this.socket.emit('join room', roomId);
   }
 
-  leaveRoom(roomID: any) {
+  leaveRoom(roomID: any): Promise<void> {
     const roomId = String(roomID ?? '').trim();
-    if (!roomId) return;
+    if (!roomId) return Promise.resolve();
     this.joinedRooms.delete(roomId);
-    if (this.socket?.connected) this.socket.emit('leave room', roomId);
+    if (!this.socket?.connected) return Promise.resolve();
+
+    return new Promise((resolve) => {
+      let completed = false;
+      const finish = () => {
+        if (completed) return;
+        completed = true;
+        clearTimeout(timeout);
+        resolve();
+      };
+      const timeout = setTimeout(finish, 500);
+      this.socket.emit('leave room', roomId, finish);
+    });
   }
 
   playStream(obj: any) {
